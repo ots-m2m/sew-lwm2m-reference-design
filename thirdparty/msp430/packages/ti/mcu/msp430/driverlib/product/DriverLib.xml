@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gep name="DriverLib" title="MSP430 DriverLib" version="1">
+  <page name="Welcome" title="Welcome" DPI="2540">
+    <html><body><table>
+      <tr>
+	<td><control type="checkbox" label="Add DriverLib to my configuration" value="value:this.$used" bold="true"/></td>
+      </tr>
+      <tr></tr>
+      <tr><td colspan="2">
+        <h1>Introduction</h1>
+        <form>
+	  <p>DriverLib provides low-level peripheral control functions
+	  that enable simple and efficient control of peripherals
+	  found on the MSP430.  The drivers are provided in source
+	  form to allow maximum reuse in a variety of development
+	  environments.
+	  </p>
+        </form>
+      </td></tr>
+      <tr>
+        <td>
+	  <h1>Getting Started</h1>
+	  <form>
+	    <li>See the <a href="help:http:/help/topic/com.ti.mcu.msp430.driverlib.product.ui/release_notes.html#Documentation">DriverLib User Guide</a> for your device family.</li>
+	    <li><a href="help:http:/help/topic/com.ti.mcu.msp430.driverlib.product.ui/release_notes.html">
+	    MSP430 DriverLib Release Notes</a></li>
+	  </form>
+        </td>
+        <td>
+	  <h1>More Information</h1>
+	  <form>
+	    <li>Additional information on how to use DriverLib can be found <a href="http://www.ti.com/tool/msp430ware">here</a></li>
+	    <li>In-depth peripheral specific information is available
+	    in the <a
+	    href="http://www-s.ti.com/sc/techlit/SLAU367">MSP430
+	    MSP430FR58xx and MSP430FR59xx Family User's Guide</a> or
+	    <a
+		href="http://www-s.ti.com/sc/techlit/SLAU208">MSP430x5xx
+	    and MSP430x6xx Family User's Guide</a></li>
+	    <li>Please post your questions and feedback to the <a href="http://www.ti.com/gracefeedback">MSP430 E2E Forum</a></li>
+	  </form>
+        </td>
+      </tr>
+    </table></body></html>
+  </page>
+</gep>

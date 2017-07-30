@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Test Water Meter",
+    "id": 9024,
+    "instancetype": "multiple",
+    "mandatory": false,
+    "description": "",
+    "resourcedefs": [
+      {
+        "id": 0,
+        "name": "Water Pressure",
+        "operations": "RW",
+        "instancetype": "single",
+        "mandatory": true,
+        "type": "float",
+        "range": "",
+        "units": "",
+        "description": ""
+      }
+    ]
+  }
+]

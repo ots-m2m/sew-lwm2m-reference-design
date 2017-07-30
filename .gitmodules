@@ -1,0 +1,9 @@
+[submodule "thirdparty/lwip"]
+	path = thirdparty/lwip
+	url = https://git.savannah.nongnu.org/git/lwip.git
+[submodule "thirdparty/wakaama"]
+	path = thirdparty/wakaama
+	url = https://github.com/eclipse/wakaama.git
+[submodule "thirdparty/unity"]
+	path = thirdparty/unity
+	url = https://github.com/ThrowTheSwitch/Unity.git

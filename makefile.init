@@ -1,0 +1,69 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Place any extra c-flags required for an individual file here. 
+
+# These are here to disable wanrings in thirdparty libraries that we
+# do not want to change. 
+thirdparty/wakaama/core/data.o: EXTRA_CFLAGS += -Wno-pointer-sign
+thirdparty/wakaama/core/liblwm2m.o: EXTRA_CFLAGS += -Wno-unused-variable
+thirdparty/wakaama/core/tlv.o: EXTRA_CFLAGS += -Wno-shift-count-overflow
+thirdparty/wakaama/core/transaction.o: EXTRA_CFLAGS += -Wno-pointer-sign -Wno-maybe-uninitialized
+thirdparty/wakaama/core/objects.o: EXTRA_CFLAGS += -Wno-pointer-sign
+thirdparty/wakaama/core/uri.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/wakaama/core/observe.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/wakaama/core/bootstrap.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/wakaama/core/liblwm2m.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/wakaama/core/registration.o: EXTRA_CFLAGS += -Wno-pointer-sign
+
+thirdparty/lwip/src/core/dns.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/lwip/src/core/memp.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/lwip/src/core/pbuf.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/lwip/src/core/raw.o: EXTRA_CFLAGS += -Wno-sign-compare
+thirdparty/lwip/src/api/api_msg.o: EXTRA_CFLAGS += -Wno-unused-but-set-variable
+
+
+lwm2m/lwm2m_platform.o: EXTRA_CFLAGS += -Wno-unused-variable
+
+lwm2m/objects/Device_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/Firmware_Update_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/LWM2M_Server_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/Delivery_Schedule_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/Event_Data_Delivery_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/Interval_Data_Delivery_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/Water_Flow_Readings_object.o: EXTRA_CFLAGS += -Wno-type-limits
+lwm2m/objects/Water_Meter_High_Pressure_Alarm_object.o: EXTRA_CFLAGS += -Wno-type-limits
+
+
+
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/adc12_a.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/battbak.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/comp_b.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/crc.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/dac12_a.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/dma.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/gpio.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/lcd_b.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/ldopwr.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/mpy32.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/pmap.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/ref.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/rtc_b.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/sysctl.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/timer_a.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast -Wno-parentheses
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/timer_b.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast -Wno-parentheses
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/ucs.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast -Wno-parentheses -Wno-maybe-uninitialized
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/usci_a_spi.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/usci_a_uart.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast  -Wno-parentheses
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/usci_b_i2c.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/usci_b_spi.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+thirdparty/msp430/driverlib/MSP430F5xx_6xx/wdt_a.o: EXTRA_CFLAGS += -Wno-int-to-pointer-cast
+
+
+utils/libc/printf.o: EXTRA_CFLAGS += -Wno-pointer-to-int-cast
+utils/libc/snprintf.o: EXTRA_CFLAGS += -Wno-type-limits -Wno-sign-compare -Wno-unused-but-set-variable
+
+
+#FIXME we should be able to get this to compile without diabling these wanrings.
+network/slip/slip_socket.o: EXTRA_CFLAGS += -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast

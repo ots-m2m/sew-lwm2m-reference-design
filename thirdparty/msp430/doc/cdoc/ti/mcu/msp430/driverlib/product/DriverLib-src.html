@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><title>module ti.mcu.msp430.driverlib.product.DriverLib</title>
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="stylesheet" type="text/css" href="../../../../../src.css"/>
+</head>
+<body>
+<pre class=src>
+     1    <span class="xdoc">/*!
+</span>     2    <span class="xdoc"> *  ======== DriverLib ========
+</span>     3    <span class="xdoc"> *  MSP430 Low-Level Peripheral Driver Support Library
+</span>     4    <span class="xdoc"> *
+</span>     5    <span class="xdoc"> *  DriverLib provides low-level peripheral functions that enables simple
+</span>     6    <span class="xdoc"> *  and efficient control of peripherals found on the MSP430.  The functions
+</span>     7    <span class="xdoc"> *  are provided in source form to allow maximum reuse in a variety of
+</span>     8    <span class="xdoc"> *  development environments.
+</span>     9    <span class="xdoc"> *
+</span>    10    <span class="xdoc"> *  This module provides the "home page" for DriverLib within the Grace
+</span>    11    <span class="xdoc"> *  graphical configuration editor.  This enables projects that support
+</span>    12    <span class="xdoc"> *  graphical configuration to easily integrate with DriverLib.  In particular,
+</span>    13    <span class="xdoc"> *  for these projects
+</span>    14    <span class="xdoc"> *  <b>@p(blist)</b>
+</span>    15    <span class="xdoc"> *      - DriverLib sources are automatically compiled for your specific device
+</span>    16    <span class="xdoc"> *      - compiler and linker options are automatically added, and
+</span>    17    <span class="xdoc"> *      - you can easily switch between different versions of DriverLib on
+</span>    18    <span class="xdoc"> *        a per-project basis
+</span>    19    <span class="xdoc"> *  <b>@p</b>
+</span>    20    <span class="xdoc"> *  This support makes it simple to create Code Composer Studio (CCS) projects
+</span>    21    <span class="xdoc"> *  that enable you to easily build and manage specific versions of pre-built
+</span>    22    <span class="xdoc"> *  DriveLib libraries.  These pre-built libraries can then be referenced by
+</span>    23    <span class="xdoc"> *  one or more of your existing projects.
+</span>    24    <span class="xdoc"> *  
+</span>    25    <span class="xdoc"> *  <b>@a(Using DriverLib)</b>
+</span>    26    <span class="xdoc"> *  Using DriverLib is a simple three step process.
+</span>    27    <span class="xdoc"> *  <b>@p(nlist)</b>
+</span>    28    <span class="xdoc"> *      - modify your `.c` sources to include the appropriate peripheral header
+</span>    29    <span class="xdoc"> *        file and call the desired function.
+</span>    30    <span class="xdoc"> *      - modify your compiler project options to include the directory
+</span>    31    <span class="xdoc"> *        containing the DriverLib product's root directory.
+</span>    32    <span class="xdoc"> *      - modify your linker project options to include the path to a
+</span>    33    <span class="xdoc"> *        pre-built library of the appropriate DriverLib sources.
+</span>    34    <span class="xdoc"> *  <b>@p</b>
+</span>    35    <span class="xdoc"> *
+</span>    36    <span class="xdoc"> *  Suppose, for example, you want to use the WDT_A watchdog timer functions of
+</span>    37    <span class="xdoc"> *  DriverLib.  Your source might be modified to look like the following:
+</span>    38    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    39    <span class="xdoc"> *      #include &lt;driverlib/MSP430FR57xx/wdt_a.h&gt;     // include header for the WDT_A peripheral
+</span>    40    <span class="xdoc"> *
+</span>    41    <span class="xdoc"> *      int main(void) {
+</span>    42    <span class="xdoc"> *          WDT_A_hold(__MSP430_BASEADDRESS_WDT_A__); // disable the WDT_A watchdog timer
+</span>    43    <span class="xdoc"> *             :
+</span>    44    <span class="xdoc"> *          return (0);
+</span>    45    <span class="xdoc"> *      }
+</span>    46    <span class="xdoc"> *  <b>@p</b>
+</span>    47    <span class="xdoc"> *
+</span>    48    <span class="xdoc"> *  If you're using Code Composer Studio (CCS), DriverLib automatically defines
+</span>    49    <span class="xdoc"> *  a "macro", named `${MSP430_DRIVERLIB_ROOT}`, that should be used to specify
+</span>    50    <span class="xdoc"> *  include paths.  This ensures  that your projects are portable among users
+</span>    51    <span class="xdoc"> *  that may have different installation directories.  In this case, your
+</span>    52    <span class="xdoc"> *  compiler include options should include:
+</span>    53    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    54    <span class="xdoc"> *      -I ${MSP430_DRIVERLIB_ROOT}
+</span>    55    <span class="xdoc"> *  <b>@p</b>
+</span>    56    <span class="xdoc"> *
+</span>    57    <span class="xdoc"> *  Finally, suppose you're created a project named `driverlib_5739` which
+</span>    58    <span class="xdoc"> *  contains a pre-built DriverLib library for the MSP430FR5739.  Your linker
+</span>    59    <span class="xdoc"> *  options should include:
+</span>    60    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    61    <span class="xdoc"> *      -l "${workspace_loc:/driverlib_5739/src/driverlib/driverlib.lib}"
+</span>    62    <span class="xdoc"> *  <b>@p</b>
+</span>    63    <span class="xdoc"> *  where, `${workspace_loc: ...}` is an Eclipse/CCS macro that
+</span>    64    <span class="xdoc"> *  expands to an absolute path to the file `src/driverlib/driverlib.lib`
+</span>    65    <span class="xdoc"> *  located in the project named `driverlib_5739`.  Again, using the Eclipse
+</span>    66    <span class="xdoc"> *  `${...}` macros enables projects to be directly imported by other
+</span>    67    <span class="xdoc"> *  developers even if they have different workspace or product installation
+</span>    68    <span class="xdoc"> *  paths.
+</span>    69    <span class="xdoc"> *
+</span>    70    <span class="xdoc"> *  <b>@a(Building DriverLib)</b>
+</span>    71    <span class="xdoc"> *  If you are using Code Composer Studio (CCS), it is easy to build a library
+</span>    72    <span class="xdoc"> *  for a specific device.
+</span>    73    <span class="xdoc"> *  <b>@p(nlist)</b>
+</span>    74    <span class="xdoc"> *      - Create a new project: File -&gt; New -&gt; CCS Project
+</span>    75    <span class="xdoc"> *      - Select a device and a project name, say `MSP430FR5739` and
+</span>    76    <span class="xdoc"> *        "`driverlib_5739`"
+</span>    77    <span class="xdoc"> *      - In the "Project templates and examples" selection box, select the
+</span>    78    <span class="xdoc"> *        "Configurable DriverLib Example" template under the
+</span>    79    <span class="xdoc"> *        "MSP430 DriverLib" heading.  If you don't see this heading, the
+</span>    80    <span class="xdoc"> *        device you selected is not supported by DriverLib.
+</span>    81    <span class="xdoc"> *      - Click the "`Finish`" button.  A new project named `driverlib_5739`
+</span>    82    <span class="xdoc"> *        will be created and added to your workspace.
+</span>    83    <span class="xdoc"> *      - Build the project: Project -&gt; Build Project
+</span>    84    <span class="xdoc"> *  <b>@p</b>
+</span>    85    <span class="xdoc"> *  Once the project is finished building, a complete DriverLib library, named
+</span>    86    <span class="xdoc"> *  `driverlib.lib`, will exist in the `./src/driverlib` folder of the project
+</span>    87    <span class="xdoc"> *  and can be referenced by any other project in your workspace via the
+</span>    88    <span class="xdoc"> *  Eclipse/CCS macro:
+</span>    89    <span class="xdoc"> *  <b>@p(code)</b>
+</span>    90    <span class="xdoc"> *      ${workspace_loc:/driverlib_5739/src/driverlib/driverlib.lib}
+</span>    91    <span class="xdoc"> *  <b>@p</b>
+</span>    92    <span class="xdoc"> */</span>
+    93    @Template(<span class="string">"./DriverLib.xdt"</span>)
+    94    <span class=key>metaonly</span> <span class=key>module</span> DriverLib
+    95    {
+    96        <span class="xdoc">/*!
+</span>    97    <span class="xdoc">     *  ======== BASENAME ========
+</span>    98    <span class="xdoc">     *  The base name of the pre-built DriverLib library
+</span>    99    <span class="xdoc">     *  
+</span>   100    <span class="xdoc">     *  This name controls the name of a pre-built DriverLib library.  For
+</span>   101    <span class="xdoc">     *  example, if BASENAME is set to "driverlib" the name of the library
+</span>   102    <span class="xdoc">     *  will be driverlib.lib in the ./src/driverlib folder of your project.
+</span>   103    <span class="xdoc">     *  
+</span>   104    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   105    <span class="xdoc">     */</span>
+   106        <span class=key>const</span> String BASENAME = <span class="string">"driverlib"</span>;
+   107    
+   108        <span class="xdoc">/*!
+</span>   109    <span class="xdoc">     *  ======== getFamilyPath ========
+</span>   110    <span class="xdoc">     *  Given a device name, return the path to the device family's sources
+</span>   111    <span class="xdoc">     *
+</span>   112    <span class="xdoc">     *  This function returns a path relative to the DriverLib source
+</span>   113    <span class="xdoc">     *  repository containing the DriverLib sources.  For example,
+</span>   114    <span class="xdoc">     *  if `deviceName` is `"MSP430FR5969"`, this function returns
+</span>   115    <span class="xdoc">     *  `"driverlib/MSP430FR5xx_6xx"`.
+</span>   116    <span class="xdoc">     *
+</span>   117    <span class="xdoc">     *  The string returned by this function can be used with `getSrcRepo`
+</span>   118    <span class="xdoc">     *  to obtain the absolute path to the sources for the DriverLib family
+</span>   119    <span class="xdoc">     *  that supports the device `deviceName`.
+</span>   120    <span class="xdoc">     *  
+</span>   121    <span class="xdoc">     *  <b>@see</b> #getSrcRepo
+</span>   122    <span class="xdoc">     */</span>
+   123        String getFamilyPath(String deviceName);
+   124    
+   125        <span class="xdoc">/*!
+</span>   126    <span class="xdoc">     *  ======== getLibPath ========
+</span>   127    <span class="xdoc">     *  Returns the path to a pre-built DriverLib library
+</span>   128    <span class="xdoc">     *  
+</span>   129    <span class="xdoc">     *  This function is called by the `getLibs()` method provided by the
+</span>   130    <span class="xdoc">     *  package containing the DriverLib module.  This `getLibs()` method
+</span>   131    <span class="xdoc">     *  is implemented in the `package.xs` file and is used to provide the
+</span>   132    <span class="xdoc">     *  path to a pre-built DriverLib library for any project that uses
+</span>   133    <span class="xdoc">     *  DriverLib.
+</span>   134    <span class="xdoc">     *  
+</span>   135    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   136    <span class="xdoc">     */</span>
+   137        String getLibPath();
+   138    
+   139        <span class="xdoc">/*!
+</span>   140    <span class="xdoc">     *  ======== getSrcRepo ========
+</span>   141    <span class="xdoc">     *  Given a family path, return the path to it's source repository
+</span>   142    <span class="xdoc">     *
+</span>   143    <span class="xdoc">     *  This function returns an absolute path to the repository
+</span>   144    <span class="xdoc">     *  containing the DriverLib sources for the specified device family.
+</span>   145    <span class="xdoc">     *
+</span>   146    <span class="xdoc">     *  <b>@see</b> #getFamilyPath
+</span>   147    <span class="xdoc">     */</span>
+   148        String getSrcRepo(String familyPath);
+   149    
+   150        <span class="xdoc">/*!
+</span>   151    <span class="xdoc">     *  ======== outputDir ========
+</span>   152    <span class="xdoc">     *  The output directory for all generated sources
+</span>   153    <span class="xdoc">     *
+</span>   154    <span class="xdoc">     *  The default output directory is the `src/` sub-directory of the
+</span>   155    <span class="xdoc">     *  directory containing the configuration script used to specify
+</span>   156    <span class="xdoc">     *  the peripherals for which to generate code.
+</span>   157    <span class="xdoc">     *
+</span>   158    <span class="xdoc">     *  This parameter should only be changed when running the
+</span>   159    <span class="xdoc">     *  configuration tool in a command line environment.  Integrated
+</span>   160    <span class="xdoc">     *  Development Environments (IDEs) often require that generated sources
+</span>   161    <span class="xdoc">     *  be placed in specific directories.  Changes to this parameter often
+</span>   162    <span class="xdoc">     *  require corresponding changes to the IDE.
+</span>   163    <span class="xdoc">     *
+</span>   164    <span class="xdoc">     *  <b>@_nodoc</b>
+</span>   165    <span class="xdoc">     */</span>
+   166        <span class=key>config</span> String outputDir;
+   167    }
+</pre>
+</body></html>

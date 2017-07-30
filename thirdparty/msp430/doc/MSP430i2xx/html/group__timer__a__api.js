@@ -1,0 +1,27 @@
+var group__timer__a__api =
+[
+    [ "Timer_A_clear", "group__timer__a__api.html#ga62d31d8d4df1d0a2844bef21db5598ea", null ],
+    [ "Timer_A_clearCaptureCompareInterrupt", "group__timer__a__api.html#ga731824453f5c9761e3badbb0212cf8bf", null ],
+    [ "Timer_A_clearTimerInterrupt", "group__timer__a__api.html#ga7eb860f58146190f7236f6b449de2e80", null ],
+    [ "Timer_A_disableCaptureCompareInterrupt", "group__timer__a__api.html#ga9ecb10d3afa202da1e597bc42eab8241", null ],
+    [ "Timer_A_disableInterrupt", "group__timer__a__api.html#ga538c991a9ed0ff92c6d6b6aba4370263", null ],
+    [ "Timer_A_enableCaptureCompareInterrupt", "group__timer__a__api.html#ga16ebf983621ab015fc4ea61368ed9950", null ],
+    [ "Timer_A_enableInterrupt", "group__timer__a__api.html#ga3a4bc0a3b8f75eded5fde05a748b4c1b", null ],
+    [ "Timer_A_getCaptureCompareCount", "group__timer__a__api.html#ga9a2cbe6691a3d5b3324e3aebf95911f6", null ],
+    [ "Timer_A_getCaptureCompareInterruptStatus", "group__timer__a__api.html#gaebfc235be9feeecb1f303636e27b0169", null ],
+    [ "Timer_A_getCounterValue", "group__timer__a__api.html#ga7ebb59f2f5ac0d9c76b0d9d37b29dcaf", null ],
+    [ "Timer_A_getInterruptStatus", "group__timer__a__api.html#ga28d00fe81ee30bcbccf75d42c019bfbb", null ],
+    [ "Timer_A_getOutputForOutputModeOutBitValue", "group__timer__a__api.html#ga232aa5ab4bf2dd9d818f7e7b4e5028af", null ],
+    [ "Timer_A_getSynchronizedCaptureCompareInput", "group__timer__a__api.html#ga912ffae030b123e06a937a13ce630c3e", null ],
+    [ "Timer_A_initCaptureMode", "group__timer__a__api.html#ga1cb83fb94b9c6ceb67ee7f6ac140cb24", null ],
+    [ "Timer_A_initCompareMode", "group__timer__a__api.html#ga80e59fe9ca2e1303758e92a856991c58", null ],
+    [ "Timer_A_initContinuousMode", "group__timer__a__api.html#ga8667c3fa2d8c0c9b5cd80b39cfd90b20", null ],
+    [ "Timer_A_initUpDownMode", "group__timer__a__api.html#ga321a56a9b12aac55e54f07381d1c0118", null ],
+    [ "Timer_A_initUpMode", "group__timer__a__api.html#gae1af7382cf057ffb8d219ef6a6af79d7", null ],
+    [ "Timer_A_outputPWM", "group__timer__a__api.html#ga40557e002e55c549bbed8ea05b51b235", null ],
+    [ "Timer_A_setCompareValue", "group__timer__a__api.html#ga4714b03a842854b6463c8e5617c69340", null ],
+    [ "Timer_A_setOutputForOutputModeOutBitValue", "group__timer__a__api.html#ga60f622eea296c4886eb2d41142c6638e", null ],
+    [ "Timer_A_setOutputMode", "group__timer__a__api.html#gaf2be456db91a3ad87bcdae629dd0f97e", null ],
+    [ "Timer_A_startCounter", "group__timer__a__api.html#ga4b5b91515ced108bb41f6006852dc53f", null ],
+    [ "Timer_A_stop", "group__timer__a__api.html#ga1828fb54314a4d713fc9feac744a27df", null ]
+];

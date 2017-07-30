@@ -1,0 +1,19 @@
+/*
+ * Event_Data_Delivery.c
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This code was generated using gt-object-gen provided by Operational 
+ * Technology Solutions M2M Pty. Ltd. For licensing enquires visit 
+ * ot-solutions.com.au.
+ *  
+ * This file is a template for implementing application logic for the 
+ * Event_Data_Delivery object. Rename this file to have a .c extension 
+ * and the associated temaple_h file to have a .h extension then
+ * add your application behaviour.
+ *
+ */
+#include "Event_Data_Delivery.h"
+

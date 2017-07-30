@@ -1,0 +1,9 @@
+var searchData=
+[
+  ['mpy_5fgetresult',['MPY_getResult',['../group__mpy__api.html#gaf49a627feb176fda93ed9aeacea9aa32',1,'MPY_getResult(void):&#160;mpy.c'],['../group__mpy__api.html#gaf49a627feb176fda93ed9aeacea9aa32',1,'MPY_getResult(void):&#160;mpy.c']]],
+  ['mpy_5fgetsumextension',['MPY_getSumExtension',['../group__mpy__api.html#ga4a4abd9b99b8299c22f66f10e932bf8a',1,'MPY_getSumExtension(void):&#160;mpy.c'],['../group__mpy__api.html#ga4a4abd9b99b8299c22f66f10e932bf8a',1,'MPY_getSumExtension(void):&#160;mpy.c']]],
+  ['mpy_5fsetoperandone16bit',['MPY_setOperandOne16Bit',['../group__mpy__api.html#gad46fae9ab06900286ef2d41f4f78cb95',1,'MPY_setOperandOne16Bit(uint8_t multiplicationType, uint16_t operand):&#160;mpy.c'],['../group__mpy__api.html#gad46fae9ab06900286ef2d41f4f78cb95',1,'MPY_setOperandOne16Bit(uint8_t multiplicationType, uint16_t operand):&#160;mpy.c']]],
+  ['mpy_5fsetoperandone8bit',['MPY_setOperandOne8Bit',['../group__mpy__api.html#gaa414a6cc6a5660c58fa50cfe16af8f84',1,'MPY_setOperandOne8Bit(uint8_t multiplicationType, uint8_t operand):&#160;mpy.c'],['../group__mpy__api.html#gaa414a6cc6a5660c58fa50cfe16af8f84',1,'MPY_setOperandOne8Bit(uint8_t multiplicationType, uint8_t operand):&#160;mpy.c']]],
+  ['mpy_5fsetoperandtwo16bit',['MPY_setOperandTwo16Bit',['../group__mpy__api.html#ga83f777966a9c5e2c71f25c8bd6c99410',1,'MPY_setOperandTwo16Bit(uint16_t operand):&#160;mpy.c'],['../group__mpy__api.html#ga83f777966a9c5e2c71f25c8bd6c99410',1,'MPY_setOperandTwo16Bit(uint16_t operand):&#160;mpy.c']]],
+  ['mpy_5fsetoperandtwo8bit',['MPY_setOperandTwo8Bit',['../group__mpy__api.html#gaeaec9cb8949018178dbcb6879b6019f7',1,'MPY_setOperandTwo8Bit(uint8_t operand):&#160;mpy.c'],['../group__mpy__api.html#gaeaec9cb8949018178dbcb6879b6019f7',1,'MPY_setOperandTwo8Bit(uint8_t operand):&#160;mpy.c']]]
+];

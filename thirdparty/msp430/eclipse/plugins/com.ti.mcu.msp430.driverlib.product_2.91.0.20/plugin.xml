@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin
+    name="MSP430 DriverLib Target Content"
+    id="com.ti.mcu.msp430.driverlib.product_2.91.0.20"
+    version="2.91.0.20"
+    provider-name="Texas Instruments Inc.">
+
+    <extension point="org.eclipse.rtsc.xdctools.ui.productInfo">
+        <repository location="../../../packages"/>
+        <repository location="../../../."/>
+        <docs location="../../.././"/>
+        <docs location="../../../doc"/>
+        <docs location="../../../doc/cdoc"/>
+        <info
+            installLocation="../../.."
+            productName="MSP430 DriverLib"
+            versionNumber="2.91.0.20"
+        />
+    </extension>
+
+    <extension point="org.eclipse.rtsc.xdctools.model.productView">
+        <productview
+            moduleName="ti.mcu.msp430.driverlib.product.ProductView"
+         />
+    </extension>
+
+    <extension point="org.eclipse.rtsc.xdctools.managedbuild.core.rtscProductTypes">
+        <productType
+            id="com.ti.mcu.msp430.driverlib"
+            name="MSP430 DriverLib"
+            folderPrefix="msp430driverlib"
+            rootMacroName="MSP430_DRIVERLIB_ROOT"/>
+    </extension>
+
+    <extension point="org.eclipse.rtsc.xdctools.managedbuild.core.rtscProducts">
+        <product
+            productTypeId="com.ti.mcu.msp430.driverlib"
+            version="2.91.0.20">
+            <resources location="resources"/>
+        </product>
+    </extension>
+</plugin>

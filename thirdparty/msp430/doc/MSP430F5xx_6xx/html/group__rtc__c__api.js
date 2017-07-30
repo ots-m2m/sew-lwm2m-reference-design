@@ -1,0 +1,27 @@
+var group__rtc__c__api =
+[
+    [ "RTC_C_clearInterrupt", "group__rtc__c__api.html#ga65bb2410c48a1f8d0f549b92cd683e5a", null ],
+    [ "RTC_C_configureCalendarAlarm", "group__rtc__c__api.html#gaa91d9ade229a32f04feca2e92e6b879f", null ],
+    [ "RTC_C_convertBCDToBinary", "group__rtc__c__api.html#ga4594c044cea708e2d7ffb2702e1fdfbe", null ],
+    [ "RTC_C_convertBinaryToBCD", "group__rtc__c__api.html#ga5b0ba651472783daa571b0e531595567", null ],
+    [ "RTC_C_definePrescaleEvent", "group__rtc__c__api.html#gaa2b43a57e29946fecd0788874180c486", null ],
+    [ "RTC_C_disableInterrupt", "group__rtc__c__api.html#ga79a282167d69ef6a3fb09f85a55b70de", null ],
+    [ "RTC_C_enableInterrupt", "group__rtc__c__api.html#ga15bb4344d144f23fd1ae44e854291618", null ],
+    [ "RTC_C_getCalendarTime", "group__rtc__c__api.html#ga04183fca29e016847529c324454f2896", null ],
+    [ "RTC_C_getCounterValue", "group__rtc__c__api.html#gad61baf6f5cc78eb96209f29e607e454b", null ],
+    [ "RTC_C_getInterruptStatus", "group__rtc__c__api.html#ga11807c27fa0c4e3a34be751beca97a18", null ],
+    [ "RTC_C_getPrescaleValue", "group__rtc__c__api.html#ga27b907f90de59bfdf12924c247ea9388", null ],
+    [ "RTC_C_holdClock", "group__rtc__c__api.html#ga5df220d0d47a331770f8df4be780ad0c", null ],
+    [ "RTC_C_holdCounterPrescale", "group__rtc__c__api.html#ga58e12ace3f5c079da876f3875c8561e8", null ],
+    [ "RTC_C_initCalendar", "group__rtc__c__api.html#ga723b7c226882af0dc577fd4e17cb367b", null ],
+    [ "RTC_C_initCounter", "group__rtc__c__api.html#ga75da1d5319ba494229c84d7f68d0e6e1", null ],
+    [ "RTC_C_initCounterPrescale", "group__rtc__c__api.html#ga24613c540c5531c8ce5756288185f3a1", null ],
+    [ "RTC_C_setCalendarEvent", "group__rtc__c__api.html#ga2d1f80a4ea43bbfc10b255152cd1a3e4", null ],
+    [ "RTC_C_setCalibrationData", "group__rtc__c__api.html#gadb3ba2ace1e9ceb3405590e37efd0b6e", null ],
+    [ "RTC_C_setCalibrationFrequency", "group__rtc__c__api.html#gad4b233fa3d9975d026a14b60aaa0b0c9", null ],
+    [ "RTC_C_setCounterValue", "group__rtc__c__api.html#ga29bd53c890d7385ba5f967214a8f84cf", null ],
+    [ "RTC_C_setPrescaleValue", "group__rtc__c__api.html#ga34ffc12d056e0dbe4e28ae6aeefc68e5", null ],
+    [ "RTC_C_setTemperatureCompensation", "group__rtc__c__api.html#ga039fe06f6f04a558d0ef73c494f4c170", null ],
+    [ "RTC_C_startClock", "group__rtc__c__api.html#ga4277787c039bce231d1df387c11de394", null ],
+    [ "RTC_C_startCounterPrescale", "group__rtc__c__api.html#ga00aa23d1d6f98fcfd29f3dfadee23576", null ]
+];

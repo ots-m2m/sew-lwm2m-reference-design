@@ -1,0 +1,13 @@
+var searchData=
+[
+  ['msp430_20driverlib_20for_20msp430i2xx_20devices',['MSP430 DriverLib for MSP430i2xx Devices',['../index.html',1,'']]],
+  ['mpy',['mpy',['../group__mpy__api.html',1,'']]],
+  ['mpy_5fgetresult',['MPY_getResult',['../group__mpy__api.html#gaf49a627feb176fda93ed9aeacea9aa32',1,'MPY_getResult(void):&#160;mpy.c'],['../group__mpy__api.html#gaf49a627feb176fda93ed9aeacea9aa32',1,'MPY_getResult(void):&#160;mpy.c']]],
+  ['mpy_5fgetsumextension',['MPY_getSumExtension',['../group__mpy__api.html#ga4a4abd9b99b8299c22f66f10e932bf8a',1,'MPY_getSumExtension(void):&#160;mpy.c'],['../group__mpy__api.html#ga4a4abd9b99b8299c22f66f10e932bf8a',1,'MPY_getSumExtension(void):&#160;mpy.c']]],
+  ['mpy_5fsetoperandone16bit',['MPY_setOperandOne16Bit',['../group__mpy__api.html#gad46fae9ab06900286ef2d41f4f78cb95',1,'MPY_setOperandOne16Bit(uint8_t multiplicationType, uint16_t operand):&#160;mpy.c'],['../group__mpy__api.html#gad46fae9ab06900286ef2d41f4f78cb95',1,'MPY_setOperandOne16Bit(uint8_t multiplicationType, uint16_t operand):&#160;mpy.c']]],
+  ['mpy_5fsetoperandone8bit',['MPY_setOperandOne8Bit',['../group__mpy__api.html#gaa414a6cc6a5660c58fa50cfe16af8f84',1,'MPY_setOperandOne8Bit(uint8_t multiplicationType, uint8_t operand):&#160;mpy.c'],['../group__mpy__api.html#gaa414a6cc6a5660c58fa50cfe16af8f84',1,'MPY_setOperandOne8Bit(uint8_t multiplicationType, uint8_t operand):&#160;mpy.c']]],
+  ['mpy_5fsetoperandtwo16bit',['MPY_setOperandTwo16Bit',['../group__mpy__api.html#ga83f777966a9c5e2c71f25c8bd6c99410',1,'MPY_setOperandTwo16Bit(uint16_t operand):&#160;mpy.c'],['../group__mpy__api.html#ga83f777966a9c5e2c71f25c8bd6c99410',1,'MPY_setOperandTwo16Bit(uint16_t operand):&#160;mpy.c']]],
+  ['mpy_5fsetoperandtwo8bit',['MPY_setOperandTwo8Bit',['../group__mpy__api.html#gaeaec9cb8949018178dbcb6879b6019f7',1,'MPY_setOperandTwo8Bit(uint8_t operand):&#160;mpy.c'],['../group__mpy__api.html#gaeaec9cb8949018178dbcb6879b6019f7',1,'MPY_setOperandTwo8Bit(uint8_t operand):&#160;mpy.c']]],
+  ['msbfirst',['msbFirst',['../struct_e_u_s_c_i___a___s_p_i__init_slave_param.html#adb017c707e99e9f741ba0dd60bc850aa',1,'EUSCI_A_SPI_initSlaveParam::msbFirst()'],['../struct_e_u_s_c_i___a___s_p_i__init_master_param.html#a67c8dc4aae17ddeb3dc1f59a09d79546',1,'EUSCI_A_SPI_initMasterParam::msbFirst()'],['../struct_e_u_s_c_i___b___s_p_i__init_master_param.html#a2c822fbb43fe535a4f95dd137e90288e',1,'EUSCI_B_SPI_initMasterParam::msbFirst()'],['../struct_e_u_s_c_i___b___s_p_i__init_slave_param.html#a38a0bb4edb0df6c04d309da8d271811d',1,'EUSCI_B_SPI_initSlaveParam::msbFirst()']]],
+  ['msborlsbfirst',['msborLsbFirst',['../struct_e_u_s_c_i___a___u_a_r_t__init_param.html#a9cf83fead56de9c7e0ea0ceeaef56f69',1,'EUSCI_A_UART_initParam']]]
+];

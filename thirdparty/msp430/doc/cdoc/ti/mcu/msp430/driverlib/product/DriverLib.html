@@ -1,0 +1,192 @@
+<html>
+<head>
+<title>module ti.mcu.msp430.driverlib.product.DriverLib</title>
+<meta name="description" content="MSP430 Low-Level Peripheral Driver Support Library">
+<link rel="stylesheet" type="text/css" href="../../../../../xdoc.css" />
+</head>
+<body><div id="xdocWrapper"><div id="xdocContent">
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-kw1">metaonly </span><span class="xdoc-kw1">module</span> <span class="xdoc-id">ti.mcu.msp430.driverlib.product.</span><span class="xdoc-id">DriverLib</span></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/mcu/msp430/driverlib/product/package.html" title="package ti.mcu.msp430.driverlib.product"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/mcu/msp430/driverlib/product/DriverLib.html">index URL</a></div>
+<p class="xdocHdrSummary">MSP430 Low-Level Peripheral Driver Support Library</p>
+<ul class="xdocToc">
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-1">DETAILS</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-2">USING DRIVERLIB</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#xdoc-sect-3">BUILDING DRIVERLIB</a></li>
+<li class="xdocToc"><a class="xdocToc" href="#meta-synop">Configuration settings</a></li>
+<li class="xdocToc2"><a class="xdocToc" href="#xdocMetaElems">Individual elements</a></li>
+</ul>
+<div class="xdocBrief">
+DriverLib provides low-level peripheral functions that enables simple
+  and efficient control of peripherals found on the MSP430.  The functions
+  are provided in source form to allow maximum reuse in a variety of
+  development environments.
+[&nbsp;<a class="xdocBrief" href="#xdoc-desc">more</a>&nbsp;...&nbsp;]
+</div>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight">sourced in <a class="xdocLink" href="../../../../../ti/mcu/msp430/driverlib/product/DriverLib-src.html"><span class="xdocLabelFile">ti/mcu/msp430/driverlib/product/DriverLib.xdc</span></a></td>
+</tr></table>
+<div class="xdocSynM">
+<div class="xdocSynCode">
+<tt></tt><span class="xdoc-kw1">var</span> DriverLib = <span class="xdoc-kw3">xdc.useModule</span>(<span class="xdoc-id">'ti.mcu.msp430.driverlib.product.DriverLib'</span>);
+</div>
+<div class='xdocSynHdr'>module-wide functions</div>
+
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Family.Path">DriverLib.<span class="xdoc-id">getFamilyPath</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Given a device name, return the path to the device family's sources</span></span></a>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">deviceName</span>) <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynCode">
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;</tt><tt></tt><a class="xdocSynGo" href="#get.Src.Repo">DriverLib.<span class="xdoc-id">getSrcRepo</span><span class="xdocSynHoverShadow"><span class="xdocSynHover">//&nbsp;Given a family path, return the path to it's source repository</span></span></a>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">familyPath</span>) <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+</div>
+<span id="xdoc-desc"></span>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">DriverLib provides low-level peripheral functions that enables simple
+  and efficient control of peripherals found on the MSP430.  The functions
+  are provided in source form to allow maximum reuse in a variety of
+  development environments.</div>
+<div class="xdocText">This module provides the "home page" for DriverLib within the Grace
+  graphical configuration editor.  This enables projects that support
+  graphical configuration to easily integrate with DriverLib.  In particular,
+  for these projects</div>
+<div class="xdocText"><UL><LI> DriverLib sources are automatically compiled for your specific device
+</LI><LI> compiler and linker options are automatically added, and
+</LI><LI> you can easily switch between different versions of DriverLib on
+        a per-project basis
+</LI></UL></div>
+<div class="xdocText">This support makes it simple to create Code Composer Studio (CCS) projects
+  that enable you to easily build and manage specific versions of pre-built
+  DriveLib libraries.  These pre-built libraries can then be referenced by
+  one or more of your existing projects.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">USING DRIVERLIB</div>
+<div class="xdocText">Using DriverLib is a simple three step process.</div>
+<div class="xdocText"><OL><LI> modify your <tt>.c</tt> sources to include the appropriate peripheral header
+        file and call the desired function.
+</LI><LI> modify your compiler project options to include the directory
+        containing the DriverLib product's root directory.
+</LI><LI> modify your linker project options to include the path to a
+        pre-built library of the appropriate DriverLib sources.
+</LI></OL></div>
+<div class="xdocText">Suppose, for example, you want to use the WDT_A watchdog timer functions of
+  DriverLib.  Your source might be modified to look like the following:</div>
+<div class="xdocText"><PRE class="Example">      #include &lt;driverlib/MSP430FR57xx/wdt_a.h&gt;     // include header for the WDT_A peripheral
+
+      int main(void) {
+          WDT_A_hold(__MSP430_BASEADDRESS_WDT_A__); // disable the WDT_A watchdog timer
+             :
+          return (0);
+      }
+</PRE></div>
+<div class="xdocText">If you're using Code Composer Studio (CCS), DriverLib automatically defines
+  a "macro", named <tt>${MSP430_DRIVERLIB_ROOT}</tt>, that should be used to specify
+  include paths.  This ensures  that your projects are portable among users
+  that may have different installation directories.  In this case, your
+  compiler include options should include:</div>
+<div class="xdocText"><PRE class="Example">      -I ${MSP430_DRIVERLIB_ROOT}
+</PRE></div>
+<div class="xdocText">Finally, suppose you're created a project named <tt>driverlib_5739</tt> which
+  contains a pre-built DriverLib library for the MSP430FR5739.  Your linker
+  options should include:</div>
+<div class="xdocText"><PRE class="Example">      -l "${workspace_loc:/driverlib_5739/src/driverlib/driverlib.lib}"
+</PRE></div>
+<div class="xdocText">where, <tt>${workspace_loc: ...}</tt> is an Eclipse/CCS macro that
+  expands to an absolute path to the file <tt>src/driverlib/driverlib.lib</tt>
+  located in the project named <tt>driverlib_5739</tt>.  Again, using the Eclipse
+  <tt>${...}</tt> macros enables projects to be directly imported by other
+  developers even if they have different workspace or product installation
+  paths.</div>
+<span id="xdoc-sect-3"></span>
+<div class="xdocSect">BUILDING DRIVERLIB</div>
+<div class="xdocText">If you are using Code Composer Studio (CCS), it is easy to build a library
+  for a specific device.</div>
+<div class="xdocText"><OL><LI> Create a new project: File -&gt; New -&gt; CCS Project
+</LI><LI> Select a device and a project name, say <tt>MSP430FR5739</tt> and
+        "<tt>driverlib_5739</tt>"
+</LI><LI> In the "Project templates and examples" selection box, select the
+        "Configurable DriverLib Example" template under the
+        "MSP430 DriverLib" heading.  If you don't see this heading, the
+        device you selected is not supported by DriverLib.
+</LI><LI> Click the "<tt>Finish</tt>" button.  A new project named <tt>driverlib_5739</tt>
+        will be created and added to your workspace.
+</LI><LI> Build the project: Project -&gt; Build Project
+</LI></OL></div>
+<div class="xdocText">Once the project is finished building, a complete DriverLib library, named
+  <tt>driverlib.lib</tt>, will exist in the <tt>./src/driverlib</tt> folder of the project
+  and can be referenced by any other project in your workspace via the
+  Eclipse/CCS macro:</div>
+<div class="xdocText"><PRE class="Example">      ${workspace_loc:/driverlib_5739/src/driverlib/driverlib.lib}
+</PRE></div>
+<div id="xdocSep">
+</div>
+<div id="xdocMetaElems">
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Family.Path"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">DriverLib.</span><span class="xdoc-id">getFamilyPath</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/mcu/msp430/driverlib/product/DriverLib.html" title="module DriverLib"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/mcu/msp430/driverlib/product/DriverLib.html#get.Family.Path">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Given a device name, return the path to the device family's sources</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>DriverLib.<span class="xdoc-id">getFamilyPath</span>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">deviceName</span>) <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function returns a path relative to the DriverLib source
+  repository containing the DriverLib sources.  For example,
+  if <tt>deviceName</tt> is <tt>"MSP430FR5969"</tt>, this function returns
+  <tt>"driverlib/MSP430FR5xx_6xx"</tt>.</div>
+<div class="xdocText">The string returned by this function can be used with <tt>getSrcRepo</tt>
+  to obtain the absolute path to the sources for the DriverLib family
+  that supports the device <tt>deviceName</tt>.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="DriverLib.html#get.Src.Repo" title="getSrcRepo">getSrcRepo</a></div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<a class="xdocAnchor" id="get.Src.Repo"></a>
+<table class="xdocHdr"><tr>
+<td class="xdocHdrTitle"><span class="xdoc-id">DriverLib.</span><span class="xdoc-id">getSrcRepo</span>()&nbsp;&nbsp;<small><span class="xdocSynSum">//&nbsp;module-wide</span></small></td>
+<td class="xdocHdrArrow">
+<a class="xdocHdrLink" href="../../../../../ti/mcu/msp430/driverlib/product/DriverLib.html" title="module DriverLib"><img class="xdocHdrArrow" src="../../../../../Arrow_up.png"/></a></td>
+</table>
+<div class=xdocHdrIndex><a class=xdocHdrIndex title="right-click to capture" href="../../../../../index.html#ti/mcu/msp430/driverlib/product/DriverLib.html#get.Src.Repo">index URL</a></div>
+<p class="xdocHdrSummaryDcl">Given a family path, return the path to it's source repository</p>
+<span id='meta-synop'></span>
+<table class="xdocLabel"><tr>
+<td class="xdocLabelLeft"><tt><span class="xdoc-id-meta2dcl"></span></tt>Configuration settings</td>
+<td class="xdocLabelRight"></td>
+</tr></table>
+<div class="xdocSynMdcl">
+<div class="xdocSynCode">
+<tt></tt><tt></tt>DriverLib.<span class="xdoc-id">getSrcRepo</span>(<i><span class="xdoc-kw2">String</span></i> <span class="xdoc-id">familyPath</span>) <i>returns</i> <i><span class="xdoc-kw2">String</span></i>
+</div>
+</div>
+<div class="xdocSynSpacer">&nbsp;</div>
+<span id="xdoc-sect-1"></span>
+<div class="xdocSect">DETAILS</div>
+<div class="xdocText">This function returns an absolute path to the repository
+  containing the DriverLib sources for the specified device family.</div>
+<span id="xdoc-sect-2"></span>
+<div class="xdocSect">SEE</div>
+<div class="xdocText"><a class="xdoc-link" href="DriverLib.html#get.Family.Path" title="getFamilyPath">getFamilyPath</a></div>
+</div>
+<div id="xdocDate">generated on Tue, 23 May 2017 00:17:27 GMT</div>
+</div></div></body>
+</html>

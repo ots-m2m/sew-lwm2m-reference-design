@@ -1,0 +1,144 @@
+%%{
+    /* 
+     *  ======== makfile.xdt ========
+     *  This template file is used to generate a makefile that builds DriverLib
+     *  in projects that contain a .cfg script that uses the DriverLib 
+     *  module.
+     */
+    var isWindows = environment["os.name"].match(/Windows.*/i);
+
+    var OBJDIR_FWD = "objs/";
+    var OBJDIR     = isWindows ? "objs\\" : OBJDIR_FWD;
+    var DEVICE     = Program.cpu.deviceName.toUpperCase().split("_")[0];
+    var TARGET     = $args[0];
+    var LIBNAME    = this.BASENAME + ".lib";
+    
+    /* if target has no compilation command, we must be in standalone mode */
+    var isSAT = TARGET.cc.cmd == null;
+
+    /*
+     *  ======== objName ========
+     */
+    function objName(base, fwd)
+    {
+        /* if fwd is defined and false, use native file names */
+        var prefix = fwd == false ? ('"' + OBJDIR + '"') : OBJDIR_FWD;
+
+        /* Note: on Windows, the double quotes used above are necessary to
+         * prevent 'objs\*' from being passed to CreateProcess as just 'objs*'
+         * by GNU make.  Adding the quotes forces GNU make to create a .bat
+         * file with the unadulterated 'objs\*'.
+         *
+         * Since double quotes are removed by POSIX shells, the string
+         * returned below will be properly expanded in all environments.
+         */
+
+        return (prefix + base + ".obj");
+    }
+
+    /* locate the compiler's "root" directory */
+    var CGEN = TARGET.rootDir.replace(/\\/g, "/");
+
+    /* add "'s around cmds to workaround bug in error parser (8/21/2012) */
+    var CC_CMD = '"' + CGEN + "/bin/" + TARGET.cc.cmd.replace(/(^[^\s]+)/, '$1"');
+    var AR_CMD = '"' + CGEN + "/bin/" + TARGET.ar.cmd.replace(/(^[^\s]+)/, '$1"');
+    
+    /* locate the MSP430 header file directory along package path */
+    var MSPI = xdc.findFile("msp430/include")
+        || xdc.findFile("ti/mcu/msp430/include");
+    if (MSPI == null) {
+        this.$logError("can't find msp430 header files", this);
+    }
+
+    /* get list of all driverlib sources and include path for compilation */
+    var DRVI = "";
+    var DRV_SRCS = [];
+    var familyPath = this.getFamilyPath(Program.cpu.deviceName);
+    if (familyPath != null) {
+        /* determine the driverlib source repo */
+        var DRVI = this.getSrcRepo(familyPath);
+
+        /* get list of all driverlib sources */
+        var DRV_SRCDIR = java.io.File(DRVI + '/' + familyPath);
+        if (DRV_SRCDIR.exists()) {
+            var list = DRV_SRCDIR.list();
+            for (var i = 0; i < list.length; i++) {
+                var name = String(list[i]);
+                if (name.match(/\.c$/) != null && name[0] != '.') {
+                    DRV_SRCS.push(name);
+                }
+            }
+        }
+        DRV_SRCDIR = String(DRV_SRCDIR).replace(/\\/g, '/');
+    }
+
+    if (isWindows) {
+        MSPI = MSPI.replace(/\\/g, "/");
+        DRVI = DRVI.replace(/\\/g, "/");
+    }
+
+    /* create list of object file names */
+    var OBJS = "";
+    for each (var p in DRV_SRCS) {
+        var base = p.substr(0, p.length - 2);
+        OBJS += " " + objName(base);
+    }
+%%}
+#
+# This makefile builds the DriverLib sources and archives the results to
+# create `LIBNAME`
+#
+
+%if (DRV_SRCS.length > 0) {
+# path to use to find driver sources
+DRV_SRCDIR = `DRV_SRCDIR`
+vpath %.c $(DRV_SRCDIR)
+
+%}
+# Optional compiler flags
+#
+# Note: By default, we suppress power advice due to lots false positives.
+#       However, the user can reenable this using their project options
+#
+CCOPTS ?= --advice:power_severity=suppress `TARGET.ccOpts.prefix` `TARGET.ccOpts.suffix`
+
+# Required C preprocessor flags
+#    compiler   headers: "`CGEN`/include"
+#    device     headers: "`MSPI`"
+#    DriverLib  headers: "`DRVI`"
+#
+%var suffix = '-I "' + DRVI + '"' +  ' -I "' + DRV_SRCDIR + '"';
+CPPFLAGS = -D__`DEVICE`__ -I "`CGEN`/include" -I "`MSPI`" `suffix`
+
+# The compiler and archiver commands
+CC = `CC_CMD` --obj_directory=`OBJDIR_FWD` `TARGET.cc.opts`
+AR = `AR_CMD` `TARGET.ar.opts`
+%if (isWindows) {
+RM = cmd.exe /q /c del /f
+MKDIR = mkdir
+%} else {
+RM = rm -f
+MKDIR = mkdir -p
+%}
+
+# Create object sub-directory, if necessary
+ifeq (,$(wildcard `OBJDIR_FWD`))
+    $(shell $(MKDIR) `OBJDIR`)
+endif
+
+all: `LIBNAME`
+
+# Compile .c source to an object file
+`objName('%')`: %.c makefile
+	@echo cl`TARGET.suffix` $< ...
+	$(CC) $(CCOPTS) $(CPPFLAGS) "$<"
+
+# Combine all objects into the `LIBNAME` library
+`LIBNAME`: `OBJS`
+	@echo ar`TARGET.suffix` $@ $< ...
+	$(AR) $@ $^
+
+# Remove all generated files as part of clean
+clean:
+	-$(RM) `LIBNAME`
+	-$(RM) `objName('*', false)`

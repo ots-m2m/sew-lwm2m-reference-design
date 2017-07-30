@@ -1,0 +1,25 @@
+var group__adc10__b__api =
+[
+    [ "ADC10_B_clearInterrupt", "group__adc10__b__api.html#ga358cd5c0cf66ad6928d181d3f6485e12", null ],
+    [ "ADC10_B_configureMemory", "group__adc10__b__api.html#gaf6a2d672824e4e9149439ca0f7671dfc", null ],
+    [ "ADC10_B_disable", "group__adc10__b__api.html#ga0fc65e906f93d1178799d81632300600", null ],
+    [ "ADC10_B_disableConversions", "group__adc10__b__api.html#gae2e9ba6e7015e11f1948754463260cd3", null ],
+    [ "ADC10_B_disableInterrupt", "group__adc10__b__api.html#gacc7ec56543ac11b7cae241a7643930c8", null ],
+    [ "ADC10_B_disableReferenceBurst", "group__adc10__b__api.html#gaa1f3a3df3dc448ca32c04a9454365a9a", null ],
+    [ "ADC10_B_disableSamplingTimer", "group__adc10__b__api.html#ga0124c25707ff0da0fbc6ce42dc87bf11", null ],
+    [ "ADC10_B_enable", "group__adc10__b__api.html#gae256aedd707597be3715bd9d084eba72", null ],
+    [ "ADC10_B_enableInterrupt", "group__adc10__b__api.html#gad8505a09a1ea44fc99ca833550ff7e46", null ],
+    [ "ADC10_B_enableReferenceBurst", "group__adc10__b__api.html#ga7e81996b995701f432a2c5c7481793fd", null ],
+    [ "ADC10_B_getInterruptStatus", "group__adc10__b__api.html#ga4e6ed944fdf3bbb12b3573cca904c85d", null ],
+    [ "ADC10_B_getMemoryAddressForDMA", "group__adc10__b__api.html#gaae8c48c6844af03ca81ceb213693d7f4", null ],
+    [ "ADC10_B_getResults", "group__adc10__b__api.html#ga7f64f236013ffb0ccb524f3900610706", null ],
+    [ "ADC10_B_init", "group__adc10__b__api.html#ga2dab889cc572469ffe5ba4c2761d6610", null ],
+    [ "ADC10_B_isBusy", "group__adc10__b__api.html#ga0013403fbc6c07884adaab549bb4d64c", null ],
+    [ "ADC10_B_setDataReadBackFormat", "group__adc10__b__api.html#gaf9782a3322845118dffb5cbd888c7bd2", null ],
+    [ "ADC10_B_setReferenceBufferSamplingRate", "group__adc10__b__api.html#ga59e1508e05b26f0e3061281dea0fcf03", null ],
+    [ "ADC10_B_setResolution", "group__adc10__b__api.html#ga635a581296b9b84f849e51d893e67964", null ],
+    [ "ADC10_B_setSampleHoldSignalInversion", "group__adc10__b__api.html#ga19ebe69cb12d6194adbbb42a9e343995", null ],
+    [ "ADC10_B_setupSamplingTimer", "group__adc10__b__api.html#gac6c66ba70eaf8cad6380c8b823f90081", null ],
+    [ "ADC10_B_setWindowComp", "group__adc10__b__api.html#gaeb043703bb77cd2a580cdbf8b91a8f5a", null ],
+    [ "ADC10_B_startConversion", "group__adc10__b__api.html#ga9ce160f0099a33a85c040f3d56b946e1", null ]
+];

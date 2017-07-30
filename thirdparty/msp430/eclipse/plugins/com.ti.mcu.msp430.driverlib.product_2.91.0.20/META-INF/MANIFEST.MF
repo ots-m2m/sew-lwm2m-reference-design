@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.he
+ lp,org.eclipse.rtsc.xdctools.ui;resolution:=optional
+Bundle-Vendor: Texas Instruments Inc.
+Eclipse-LazyStart: true
+Bundle-Version: 2.91.0.20
+Bundle-Localization: plugin
+Bundle-Name: MSP430 DriverLib Embedded Runtime Content
+Created-By: 1.7.0_60 (Oracle Corporation)
+Bundle-Activator: org.eclipse.rtsc.xdctools.ui.CCSActivator;resolution
+ :=optional
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: com.ti.mcu.msp430.driverlib.product_2.91.0.20;sin
+ gleton:=true
+

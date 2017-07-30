@@ -1,0 +1,399 @@
+diff --git a/core/confirmation.c b/core/confirmation.c
+new file mode 100644
+index 0000000..a907442
+--- /dev/null
++++ b/core/confirmation.c
+@@ -0,0 +1,59 @@
++/*
++ * confirmation.c
++ *
++ *  Created on: 16Jul.,2017
++ *      Author: manderson
++ */
++#include "internals.h"
++
++lwm2m_confirmable_t * confirmation_findByUri(lwm2m_context_t * contextP, lwm2m_uri_t * uriP)
++{
++    lwm2m_confirmable_t * targetP;
++
++    targetP = contextP->confirmableList;
++    while (targetP != NULL
++        && (targetP->uri.objectId != uriP->objectId
++         || targetP->uri.flag != uriP->flag
++         || (LWM2M_URI_IS_SET_INSTANCE(uriP) && targetP->uri.instanceId != uriP->instanceId)
++         || (LWM2M_URI_IS_SET_RESOURCE(uriP) && targetP->uri.resourceId != uriP->resourceId)))
++    {
++      targetP = targetP->next;
++    }
++
++    return targetP;
++}
++
++//register the supplied URI as a confirmable resource
++void lwm2m_register_confirmable(lwm2m_context_t * contextP, lwm2m_uri_t * uriP, lwm2m_confirm_callback_t callback, void *userDataP)
++{
++    lwm2m_confirmable_t* confirmableP = confirmation_findByUri(contextP, uriP);
++    if (confirmableP == NULL)
++    {
++        confirmableP = (lwm2m_confirmable_t *)lwm2m_malloc(sizeof(lwm2m_confirmable_t));
++        if (confirmableP == NULL) return;
++        memset(confirmableP, 0, sizeof(lwm2m_confirmable_t));
++        memcpy(&(confirmableP->uri), uriP, sizeof(lwm2m_uri_t));
++        confirmableP->next = contextP->confirmableList;
++        contextP->confirmableList = confirmableP;
++    }
++    confirmableP->callBack = callback;
++    confirmableP->userData = userDataP;
++}
++
++//
++// Called whenever an ACK is received, need to check if the ACK is for
++// one of the confirmable resources.
++void confirmation_ack(lwm2m_context_t * contextP, coap_packet_t * message)
++{
++    lwm2m_confirmable_t * targetP;
++
++    targetP = contextP->confirmableList;
++    while (targetP != NULL && message->mid != targetP->last_mid)
++    {
++        targetP = targetP->next;
++    }
++    if (targetP != NULL)
++    {
++        if (targetP->callBack) targetP->callBack(targetP->userData);
++    }
++}
+diff --git a/core/data.c b/core/data.c
+index f1bd548..276e02b 100644
+--- a/core/data.c
++++ b/core/data.c
+@@ -256,6 +256,18 @@ void lwm2m_data_encode_int(int64_t value,
+     dataP->value.asInteger = value;
+ }
+ 
++int lwm2m_data_decode_objlink(const lwm2m_data_t * dataP, uint16_t * objectP, uint16_t * instanceP)
++{
++    int result = 0;
++    if (dataP->type == LWM2M_TYPE_OBJECT_LINK)
++    {
++        *objectP = dataP->value.asObjLink.objectId;
++        *instanceP = dataP->value.asObjLink.objectInstanceId;
++        result = 1;
++    }
++    return result;
++}
++
+ int lwm2m_data_decode_int(const lwm2m_data_t * dataP,
+                           int64_t * valueP)
+ {
+@@ -581,7 +593,7 @@ int lwm2m_data_serialize(lwm2m_uri_t * uriP,
+ #ifdef LWM2M_SUPPORT_JSON
+             *formatP = LWM2M_CONTENT_JSON;
+ #else
+-            *formatP = LWM2M_CONTENT_TLV;
++            *formatP = LWM2M_CONTENT_TLV_OLD;
+ #endif
+         }
+     }
+@@ -591,6 +603,9 @@ int lwm2m_data_serialize(lwm2m_uri_t * uriP,
+     {
+         *formatP = LWM2M_CONTENT_OPAQUE;
+     }
++
++    if (*formatP == LWM2M_CONTENT_TLV) *formatP = LWM2M_CONTENT_TLV_OLD;
++
+     LOG_ARG("Final format: %s", STR_MEDIA_TYPE(*formatP));
+ 
+     switch (*formatP)
+diff --git a/core/internals.h b/core/internals.h
+index 3522b06..6f84502 100644
+--- a/core/internals.h
++++ b/core/internals.h
+@@ -280,6 +280,11 @@ void observe_clear(lwm2m_context_t * contextP, lwm2m_uri_t * uriP);
+ bool observe_handleNotify(lwm2m_context_t * contextP, void * fromSessionH, coap_packet_t * message, coap_packet_t * response);
+ void observe_remove(lwm2m_observation_t * observationP);
+ lwm2m_observed_t * observe_findByUri(lwm2m_context_t * contextP, lwm2m_uri_t * uriP);
++void observe_ack(lwm2m_context_t * contextP, coap_packet_t * message);
++
++// defined in confirmation.c
++lwm2m_confirmable_t * confirmation_findByUri(lwm2m_context_t * contextP, lwm2m_uri_t * uriP);
++void confirmation_ack(lwm2m_context_t * contextP, coap_packet_t * message);
+ 
+ // defined in registration.c
+ coap_status_t registration_handleRequest(lwm2m_context_t * contextP, lwm2m_uri_t * uriP, void * fromSessionH, coap_packet_t * message, coap_packet_t * response);
+diff --git a/core/liblwm2m.h b/core/liblwm2m.h
+index 3f16a6d..d079249 100644
+--- a/core/liblwm2m.h
++++ b/core/liblwm2m.h
+@@ -349,6 +349,7 @@ void lwm2m_data_encode_float(double value, lwm2m_data_t * dataP);
+ int lwm2m_data_decode_float(const lwm2m_data_t * dataP, double * valueP);
+ void lwm2m_data_encode_bool(bool value, lwm2m_data_t * dataP);
+ int lwm2m_data_decode_bool(const lwm2m_data_t * dataP, bool * valueP);
++int lwm2m_data_decode_objlink(const lwm2m_data_t * dataP, uint16_t * objectIdP, uint16_t * objectInstanceIdP);
+ void lwm2m_data_encode_objlink(uint16_t objectId, uint16_t objectInstanceId, lwm2m_data_t * dataP);
+ void lwm2m_data_encode_instances(lwm2m_data_t * subDataP, size_t count, lwm2m_data_t * dataP);
+ void lwm2m_data_include(lwm2m_data_t * subDataP, size_t count, lwm2m_data_t * dataP);
+@@ -566,6 +567,7 @@ typedef struct _lwm2m_client_
+ typedef struct _lwm2m_transaction_ lwm2m_transaction_t;
+ 
+ typedef void (*lwm2m_transaction_callback_t) (lwm2m_transaction_t * transacP, void * message);
++typedef void (*lwm2m_confirm_callback_t) (void *data);
+ 
+ struct _lwm2m_transaction_
+ {
+@@ -600,6 +602,9 @@ typedef struct _lwm2m_watcher_
+     time_t lastTime;
+     uint32_t counter;
+     uint16_t lastMid;
++    bool confirmable;
++    lwm2m_confirm_callback_t confirmCallBack;
++    void *confirmUserData;
+     union
+     {
+         int64_t asInteger;
+@@ -615,6 +620,18 @@ typedef struct _lwm2m_observed_
+     lwm2m_watcher_t * watcherList;
+ } lwm2m_observed_t;
+ 
++typedef struct _lwm2m_confirmable_
++{
++    struct _lwm2m_confirmable_ * next;
++
++    lwm2m_uri_t uri;
++    lwm2m_confirm_callback_t callBack;
++    void *userData;
++    uint16_t last_mid;
++} lwm2m_confirmable_t;
++
++
++
+ #ifdef LWM2M_CLIENT_MODE
+ 
+ typedef enum
+@@ -643,7 +660,7 @@ typedef enum
+ typedef int (*lwm2m_bootstrap_callback_t) (void * sessionH, uint8_t status, lwm2m_uri_t * uriP, char * name, void * userData);
+ #endif
+ 
+-typedef struct
++typedef struct _lwm2m_context_t
+ {
+ #ifdef LWM2M_CLIENT_MODE
+     lwm2m_client_state_t state;
+@@ -654,6 +671,7 @@ typedef struct
+     lwm2m_server_t *     serverList;
+     lwm2m_object_t *     objectList;
+     lwm2m_observed_t *   observedList;
++    lwm2m_confirmable_t * confirmableList;
+ #endif
+ #ifdef LWM2M_SERVER_MODE
+     lwm2m_client_t *        clientList;
+@@ -695,6 +713,10 @@ int lwm2m_remove_object(lwm2m_context_t * contextP, uint16_t id);
+ int lwm2m_update_registration(lwm2m_context_t * contextP, uint16_t shortServerID, bool withObjects);
+ 
+ void lwm2m_resource_value_changed(lwm2m_context_t * contextP, lwm2m_uri_t * uriP);
++void lwm2m_resource_value_changed_with_confirm(lwm2m_context_t * contextP,lwm2m_uri_t * uriP, bool confirmable, lwm2m_confirm_callback_t confirmCallBack, void *confirmUserData);
++
++void lwm2m_register_confirmable(lwm2m_context_t * contextP, lwm2m_uri_t * uriP, lwm2m_confirm_callback_t callback, void *userDataP);
++
+ #endif
+ 
+ #ifdef LWM2M_SERVER_MODE
+diff --git a/core/management.c b/core/management.c
+index 435308d..9e64ba1 100644
+--- a/core/management.c
++++ b/core/management.c
+@@ -257,6 +257,13 @@ coap_status_t dm_handleRequest(lwm2m_context_t * contextP,
+             {
+                 coap_set_header_content_type(response, format);
+                 coap_set_payload(response, buffer, length);
++
++                lwm2m_confirmable_t *confirmable = confirmation_findByUri(contextP, uriP);
++                if (confirmable != NULL)
++                {
++                    confirmable->last_mid = response->mid;
++                    response->type = COAP_TYPE_CON;
++                }
+                 // lwm2m_handle_packet will free buffer
+             }
+             else
+diff --git a/core/observe.c b/core/observe.c
+index c8b46b5..a83134f 100644
+--- a/core/observe.c
++++ b/core/observe.c
+@@ -442,6 +442,15 @@ lwm2m_observed_t * observe_findByUri(lwm2m_context_t * contextP,
+ void lwm2m_resource_value_changed(lwm2m_context_t * contextP,
+                                   lwm2m_uri_t * uriP)
+ {
++  lwm2m_resource_value_changed_with_confirm(contextP, uriP, false, 0, 0);
++}
++
++void lwm2m_resource_value_changed_with_confirm(lwm2m_context_t * contextP,
++                                               lwm2m_uri_t * uriP,
++                                               bool confirmable,
++                                               lwm2m_confirm_callback_t confirmCallBack,
++                                               void *confirmUserData)
++{
+     lwm2m_observed_t * targetP;
+ 
+     LOG_URI(uriP);
+@@ -469,6 +478,9 @@ void lwm2m_resource_value_changed(lwm2m_context_t * contextP,
+                         {
+                             LOG("Tagging a watcher");
+                             watcherP->update = true;
++                            watcherP->confirmable = confirmable;
++                            watcherP->confirmCallBack = confirmCallBack;
++                            watcherP->confirmUserData = confirmUserData;
+                         }
+                     }
+                 }
+@@ -478,6 +490,23 @@ void lwm2m_resource_value_changed(lwm2m_context_t * contextP,
+     }
+ }
+ 
++void observe_ack(lwm2m_context_t * contextP, coap_packet_t * message)
++{
++  lwm2m_watcher_t * watcherP;
++  lwm2m_observed_t * targetP;
++
++  for (targetP = contextP->observedList ; targetP != NULL ; targetP = targetP->next)
++  {
++    for (watcherP = targetP->watcherList ; watcherP != NULL ; watcherP = watcherP->next)
++    {
++      if (message->mid == watcherP->lastMid)
++      {//found a watcher, call its callback
++        if (watcherP->confirmCallBack) watcherP->confirmCallBack(watcherP->confirmUserData);
++      }
++    }
++  }
++}
++
+ void observe_step(lwm2m_context_t * contextP,
+                   time_t currentTime,
+                   time_t * timeoutP)
+@@ -499,31 +528,7 @@ void observe_step(lwm2m_context_t * contextP,
+         time_t interval;
+ 
+         LOG_URI(&(targetP->uri));
+-        if (LWM2M_URI_IS_SET_RESOURCE(&targetP->uri))
+-        {
+-            if (COAP_205_CONTENT != object_readData(contextP, &targetP->uri, &size, &dataP)) continue;
+-            switch (dataP->type)
+-            {
+-            case LWM2M_TYPE_INTEGER:
+-                if (1 != lwm2m_data_decode_int(dataP, &integerValue))
+-                {
+-                    lwm2m_data_free(size, dataP);
+-                    continue;
+-                }
+-                storeValue = true;
+-                break;
+-            case LWM2M_TYPE_FLOAT:
+-                if (1 != lwm2m_data_decode_float(dataP, &floatValue))
+-                {
+-                    lwm2m_data_free(size, dataP);
+-                    continue;
+-                }
+-                storeValue = true;
+-                break;
+-            default:
+-                break;
+-            }
+-        }
++
+         for (watcherP = targetP->watcherList ; watcherP != NULL ; watcherP = watcherP->next)
+         {
+             if (watcherP->active == true)
+@@ -546,6 +551,32 @@ void observe_step(lwm2m_context_t * contextP,
+                      && watcherP->parameters != NULL
+                      && (watcherP->parameters->toSet & ATTR_FLAG_NUMERIC) != 0)
+                     {
++                        if ((!storeValue) && LWM2M_URI_IS_SET_RESOURCE(&targetP->uri))
++                        {
++                            if (COAP_205_CONTENT != object_readData(contextP, &targetP->uri, &size, &dataP)) continue;
++                            switch (dataP->type)
++                            {
++                            case LWM2M_TYPE_INTEGER:
++                                if (1 != lwm2m_data_decode_int(dataP, &integerValue))
++                                {
++                                    lwm2m_data_free(size, dataP);
++                                    continue;
++                                }
++                                storeValue = true;
++                                break;
++                            case LWM2M_TYPE_FLOAT:
++                                if (1 != lwm2m_data_decode_float(dataP, &floatValue))
++                                {
++                                    lwm2m_data_free(size, dataP);
++                                    continue;
++                                }
++                                storeValue = true;
++                                break;
++                            default:
++                                break;
++                            }
++                        }
++
+                         if ((watcherP->parameters->toSet & LWM2M_ATTR_FLAG_LESS_THAN) != 0)
+                         {
+                             LOG("Checking lower threshold");
+@@ -705,7 +736,7 @@ void observe_step(lwm2m_context_t * contextP,
+                                 break;
+                             }
+                         }
+-                        coap_init_message(message, COAP_TYPE_NON, COAP_205_CONTENT, 0);
++                        coap_init_message(message, watcherP->confirmable ? COAP_TYPE_CON : COAP_TYPE_NON, COAP_205_CONTENT, 0);
+                         coap_set_header_content_type(message, watcherP->format);
+                         coap_set_payload(message, buffer, length);
+                     }
+@@ -715,6 +746,7 @@ void observe_step(lwm2m_context_t * contextP,
+                     coap_set_header_token(message, watcherP->token, watcherP->tokenLen);
+                     coap_set_header_observe(message, watcherP->counter++);
+                     (void)message_send(contextP, message, watcherP->server->sessionH);
++
+                     watcherP->update = false;
+                 }
+ 
+diff --git a/core/packet.c b/core/packet.c
+index 82de962..36662af 100644
+--- a/core/packet.c
++++ b/core/packet.c
+@@ -381,7 +381,12 @@ void lwm2m_handle_packet(lwm2m_context_t * contextP,
+                 break;
+ 
+             case COAP_TYPE_ACK:
+-                transaction_handleResponse(contextP, fromSessionH, message, NULL);
++                if (!transaction_handleResponse(contextP, fromSessionH, message, NULL))
++                { //is this an ACK to a confirmable observe response?
++                  observe_ack(contextP, message);
++                  confirmation_ack(contextP, message);
++                }
++
+                 break;
+ 
+             default:
+diff --git a/core/tlv.c b/core/tlv.c
+index 6b32bd0..1caa6f1 100644
+--- a/core/tlv.c
++++ b/core/tlv.c
+@@ -180,7 +180,7 @@ static int prv_createHeader(uint8_t * header,
+                             bool isInstance,
+                             lwm2m_data_type_t type,
+                             uint16_t id,
+-                            size_t data_len)
++                            uint32_t data_len)
+ {
+     int header_len;
+     int offset;
+diff --git a/core/uri.c b/core/uri.c
+index 3a5a9e6..0aee09c 100644
+--- a/core/uri.c
++++ b/core/uri.c
+@@ -59,7 +59,7 @@ static int prv_parseNumber(uint8_t * uriString,
+                             size_t uriLength,
+                             size_t * headP)
+ {
+-    int result = 0;
++    uint32_t result = 0;
+ 
+     if (uriString[*headP] == '/')
+     {

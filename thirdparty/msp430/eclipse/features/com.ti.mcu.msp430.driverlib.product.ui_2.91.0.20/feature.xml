@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.ti.mcu.msp430.driverlib.product.ui"
+      version="2.91.0.20"
+      label="MSP430 DriverLib (IDE Client)"
+      provider-name="Texas Instruments Inc.">
+
+   <description url="http://www.ti.com/msp430ware">
+MSP430 DriverLib (IDE Client)
+
+MSP430 DriverLib IDE Client provides CCS IDE integration in the form of:
+    project templates,
+    install/update support, and
+    searchable help documenation.
+   </description>
+
+   <copyright>
+Copyright Texas Instruments 2013
+   </copyright>
+
+   <license>
+      Released under Released under the Eclipse Public License 1.0.
+Visit http://www.eclipse.org/legal/epl-v10.html for details of license.
+   </license>
+
+    <url>
+        <update label="MSP430 DriverLib Updates" url="http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSP430ware/update/latest/"/>
+        <discovery label="MSP430 DriverLib Updates" url="http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSP430ware/update/latest/"/>
+    </url>
+
+   <plugin
+        id="com.ti.mcu.msp430.driverlib.product.ui"
+        version="2.91.0.20"
+        unpack="false" 
+   />  
+    
+
+</feature>

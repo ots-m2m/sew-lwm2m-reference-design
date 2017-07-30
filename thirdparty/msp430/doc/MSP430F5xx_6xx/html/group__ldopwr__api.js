@@ -1,0 +1,27 @@
+var group__ldopwr__api =
+[
+    [ "LDOPWR_clearInterrupt", "group__ldopwr__api.html#ga8ce64a2bb75908238eda60fef053e183", null ],
+    [ "LDOPWR_disable", "group__ldopwr__api.html#gaf5f7c779916e9eb64a7f8f6d73c7ea0f", null ],
+    [ "LDOPWR_disableInterrupt", "group__ldopwr__api.html#ga9b60d78088e51bcbc1bef8520cadeaf4", null ],
+    [ "LDOPWR_disableOverloadAutoOff", "group__ldopwr__api.html#ga2c53f298e13e81ee2976c8e3d3880cdd", null ],
+    [ "LDOPWR_disablePort_U_inputs", "group__ldopwr__api.html#ga998ebc654839b02b4f27cfefec72d11b", null ],
+    [ "LDOPWR_disablePort_U_outputs", "group__ldopwr__api.html#ga55056d59407bdc5b908d42159c831642", null ],
+    [ "LDOPWR_enable", "group__ldopwr__api.html#ga2eddccd328036f84b8d5a280a78f6556", null ],
+    [ "LDOPWR_enableInterrupt", "group__ldopwr__api.html#gac53ba3a2d4721e4444230c260a94927f", null ],
+    [ "LDOPWR_enableOverloadAutoOff", "group__ldopwr__api.html#ga5520ac7bb92bedb520b73ee1dbe23dd1", null ],
+    [ "LDOPWR_enablePort_U_inputs", "group__ldopwr__api.html#ga72bd574fc2d400f5471ce327cd3b4ba7", null ],
+    [ "LDOPWR_enablePort_U_outputs", "group__ldopwr__api.html#gacbdd8f435cac2aa4675c81b073808459", null ],
+    [ "LDOPWR_getInterruptStatus", "group__ldopwr__api.html#ga3bc63e2cdad8d8d335dfe1afbdf36e26", null ],
+    [ "LDOPWR_getOverloadAutoOffStatus", "group__ldopwr__api.html#gadee5afbf2617fa5e3dc341c9cd1cf67d", null ],
+    [ "LDOPWR_getPort_U0_inputData", "group__ldopwr__api.html#ga8ffe52ceb8026350cfe8c2226ff536a0", null ],
+    [ "LDOPWR_getPort_U0_outputData", "group__ldopwr__api.html#ga90fa9dafb6370fe7caf55daeeaf14811", null ],
+    [ "LDOPWR_getPort_U1_inputData", "group__ldopwr__api.html#ga0590084c4358413a1c96fee6a898d6c7", null ],
+    [ "LDOPWR_getPort_U1_outputData", "group__ldopwr__api.html#gaeb4237a16d1fbe039438e730f3f0727a", null ],
+    [ "LDOPWR_isLDOInputValid", "group__ldopwr__api.html#ga4595ec07ffbf78c09fba4abd1828decc", null ],
+    [ "LDOPWR_lockConfiguration", "group__ldopwr__api.html#ga44a01fb149fce4c4a77506b67bc738cb", null ],
+    [ "LDOPWR_setPort_U0_outputData", "group__ldopwr__api.html#ga41cf3a689f2031258b0f07684f9b6363", null ],
+    [ "LDOPWR_setPort_U1_outputData", "group__ldopwr__api.html#ga6d172548599870ae6680ef71f54d2f1c", null ],
+    [ "LDOPWR_togglePort_U0_outputData", "group__ldopwr__api.html#ga5bdd61f6342f57b6fc8e775e09aad0e0", null ],
+    [ "LDOPWR_togglePort_U1_outputData", "group__ldopwr__api.html#gaae6f47a8dfde760d6ae1efdb5d19667c", null ],
+    [ "LDOPWR_unLockConfiguration", "group__ldopwr__api.html#ga455e0357716b627670d2da9382eb962f", null ]
+];
