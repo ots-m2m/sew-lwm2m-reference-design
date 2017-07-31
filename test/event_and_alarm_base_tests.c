@@ -672,22 +672,8 @@ void test_payload_generator(void) {
   test_utility_cbor_stream_print_hex(stream, 0, "curr state check");            // 9f 18 7b 19 02 9a 02 01 ff --> cbor.me --> [123, 666, 2, 1]
 
   { // Verification
-    uint8_t expected[] = {0x9f, 0x18, 0x7b, 0x19, 0x02, 0x9a, 0x01, 0x01, 0xff};
+    uint8_t expected[] = {0x9f, 0x18, 0x7b, 0x01, 0x19, 0x02, 0x9a, 0x01, 0xff}; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
-    /*--------------------------------------------------------------------------
-    ## Using cbor.me
-
-    ```
-    [123, 666, 1, 1]
-    9F         # array(*)
-       18 7B   # unsigned(123)
-       19 029A # unsigned(666)
-       01      # unsigned(1)
-       01      # unsigned(1)
-       FF      # primitive(*)
-    ```
-
-    --------------------------------------------------------------------------*/
   }
 
   /*  Testing for timestamp overflow using current state alarm scenario
@@ -706,23 +692,8 @@ void test_payload_generator(void) {
   test_utility_cbor_stream_print_hex(stream, 0, "timestamp overflow check");
 
   { // Verification
-    char expected[] = {0x9f, 0x18, 0x7b, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01, 0x01, 0xff};
+    char expected[] = {0x9f, 0x18, 0x7b, 0x01, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01, 0xff}; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
-    /*--------------------------------------------------------------------------
-    ## Using cbor.me
-
-    ```
-    [123, 1488775953, 1, 1]
-    -->
-    9F             # array(*)
-       18 7B       # unsigned(123)
-       1A 58BCEB11 # unsigned(1488775953)
-       01          # unsigned(1)
-       01          # unsigned(1)
-       FF          # primitive(*)
-    ```
-
-    --------------------------------------------------------------------------*/
   }
 
   /*  Alarm state change log scenario
@@ -743,48 +714,12 @@ void test_payload_generator(void) {
   { // Verification
     char expected[] = {
                         0x9f, 0x18, 0x7b, 0x02, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x9f, 0x00, 0x01, 0xff, 0xff, 0x9f, 0x1a,
-                        0x58, 0xbc, 0xeb, 0x10, 0x9f, 0x18, 0xc8, 0x01, 0xff,
-                        0xff, 0x9f, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x9f, 0x19,
-                        0x01, 0x90, 0x01, 0xff, 0xff, 0xff, 0xff
-                      };
+                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
+                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
+                        0xff
+                      }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
-    /*--------------------------------------------------------------------------
-    ## Using cbor.me
-
-    ```
-    [123, 2, [[1488775951, [0, 1]], [1488775952, [200, 1]], [1488775953, [400, 1]]]]
-    -->
-    9F                   # array(*)
-       18 7B             # unsigned(123)
-       02                # unsigned(2)
-       9F                # array(*)
-          9F             # array(*)
-             1A 58BCEB0F # unsigned(1488775951)
-             9F          # array(*)
-                00       # unsigned(0)
-                01       # unsigned(1)
-                FF       # primitive(*)
-             FF          # primitive(*)
-          9F             # array(*)
-             1A 58BCEB10 # unsigned(1488775952)
-             9F          # array(*)
-                18 C8    # unsigned(200)
-                01       # unsigned(1)
-                FF       # primitive(*)
-             FF          # primitive(*)
-          9F             # array(*)
-             1A 58BCEB11 # unsigned(1488775953)
-             9F          # array(*)
-                19 0190  # unsigned(400)
-                01       # unsigned(1)
-                FF       # primitive(*)
-             FF          # primitive(*)
-          FF             # primitive(*)
-       FF                # primitive(*)
-    ```
-
-    --------------------------------------------------------------------------*/
   }
 
 
@@ -807,48 +742,12 @@ void test_payload_generator(void) {
   { // Verification
     char expected[] = {
                         0x9f, 0x18, 0x7b, 0x03, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x9f, 0x00, 0x01, 0xff, 0xff, 0x9f, 0x1a,
-                        0x58, 0xbc, 0xeb, 0x10, 0x9f, 0x18, 0xc8, 0x01, 0xff,
-                        0xff, 0x9f, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x9f, 0x19,
-                        0x01, 0x90, 0x01, 0xff, 0xff, 0xff, 0xff
-                      };
+                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
+                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
+                        0xff
+                      }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
-    /*--------------------------------------------------------------------------
-    ## Using cbor.me
-
-    ```
-    [123, 3, [[1488775951, [0, 1]], [1488775952, [200, 1]], [1488775953, [400, 1]]]]
-    -->
-    9F                   # array(*)
-       18 7B             # unsigned(123)
-       03                # unsigned(3)
-       9F                # array(*)
-          9F             # array(*)
-             1A 58BCEB0F # unsigned(1488775951)
-             9F          # array(*)
-                00       # unsigned(0)
-                01       # unsigned(1)
-                FF       # primitive(*)
-             FF          # primitive(*)
-          9F             # array(*)
-             1A 58BCEB10 # unsigned(1488775952)
-             9F          # array(*)
-                18 C8    # unsigned(200)
-                01       # unsigned(1)
-                FF       # primitive(*)
-             FF          # primitive(*)
-          9F             # array(*)
-             1A 58BCEB11 # unsigned(1488775953)
-             9F          # array(*)
-                19 0190  # unsigned(400)
-                01       # unsigned(1)
-                FF       # primitive(*)
-             FF          # primitive(*)
-          FF             # primitive(*)
-       FF                # primitive(*)
-    ```
-
-    --------------------------------------------------------------------------*/
   }
 
 }
@@ -887,7 +786,9 @@ void test_logger(void)
   test_utility_cbor_stream_print_hex(stream, 0, "timestamp overflow check");
 
   { // Verification
-    char expected[] = {0x9f, 0x18, 0x7b, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01, 0x01, 0xff};
+    char expected[] = {0x9f, 0x18, 0x7b, 0x01, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01, 0xff}; (void)(expected);
+
+
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
 
@@ -911,11 +812,11 @@ void test_logger(void)
   { // Verification
     char expected[] = {
                         0x9f, 0x18, 0x7b, 0x02, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x9f, 0x00, 0x01, 0xff, 0xff, 0x9f, 0x1a,
-                        0x58, 0xbc, 0xeb, 0x10, 0x9f, 0x18, 0xc8, 0x01, 0xff,
-                        0xff, 0x9f, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x9f, 0x19,
-                        0x01, 0x90, 0x01, 0xff, 0xff, 0xff, 0xff
-                      };
+                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
+                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
+                        0xff
+                      }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
 
@@ -937,11 +838,11 @@ void test_logger(void)
   { // Verification
     char expected[] = {
                         0x9f, 0x18, 0x7b, 0x03, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x9f, 0x00, 0x01, 0xff, 0xff, 0x9f, 0x1a,
-                        0x58, 0xbc, 0xeb, 0x10, 0x9f, 0x18, 0xc8, 0x01, 0xff,
-                        0xff, 0x9f, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x9f, 0x19,
-                        0x01, 0x90, 0x01, 0xff, 0xff, 0xff, 0xff
-                      };
+                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
+                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
+                        0xff
+                      }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
 
@@ -960,11 +861,11 @@ void test_logger(void)
     char expected[] = {
                         0x02,
                         0x9f, 0x18, 0x7b, 0x03, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x9f, 0x00, 0x01, 0xff, 0xff, 0x9f, 0x1a,
-                        0x58, 0xbc, 0xeb, 0x10, 0x9f, 0x18, 0xc8, 0x01, 0xff,
-                        0xff, 0x9f, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x9f, 0x19,
-                        0x01, 0x90, 0x01, 0xff, 0xff, 0xff, 0xff
-                      };
+                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
+                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
+                        0xff
+                      }; (void)(expected);
     uint8_t *val_ptr = 0;
     size_t length = 0;
 

@@ -180,8 +180,8 @@ __static bool event_and_alarm_base_payload_alarm_current_state_generate(event_an
 
   // Generate payload again
   cbor_serialize_int(stream, event_code);
-  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
   cbor_serialize_int(stream, event_type);
+  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
   cbor_serialize_int(stream, new_alarm_state);
 
   return true;
@@ -201,9 +201,7 @@ __static bool event_and_alarm_base_payload_alarm_state_change_log_generate(event
   // Append Values According To Event or Alarm Type
   if (base_ptr->payload_alarm_state_change_log_append)
   { // Append Function Handler Missing
-    cbor_serialize_array_indefinite(stream);  // CBOR ARRAY [
     base_ptr->payload_alarm_state_change_log_append(stream, new_sensor_value, new_alarm_state);
-    cbor_write_break(stream);                 // CBOR BREAK ]
   }
 
   // Closing Indefinite Array
@@ -226,9 +224,7 @@ __static bool event_and_alarm_base_payload_event_log_generate(event_and_alarm_ba
   // Append Values According To Event or Alarm Type
   if (base_ptr->payload_event_log_append)
   { // Handler Exist
-    cbor_serialize_array_indefinite(stream);  // CBOR ARRAY [
     base_ptr->payload_event_log_append(stream, new_sensor_value, new_alarm_state);
-    cbor_write_break(stream);                 // CBOR BREAK ]
   }
 
   // Closing Indefinite Array
