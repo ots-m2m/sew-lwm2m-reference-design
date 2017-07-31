@@ -13,6 +13,7 @@
 #include "delivery_schedule_tests.h"
 #include "utc_offset_parser_tests.h"
 #include "parse_lwm2m_exe_arg_tests.h"
+#include "interval_data_base_tests.h"
 
 void unit_tests_run(void)
 {
@@ -23,6 +24,7 @@ void unit_tests_run(void)
   delivery_schedule_tests_run();
   utc_offset_parse_tests_run();
   parse_lwm2m_exe_arg_test_run();
+  interval_data_tests_run();
 }
 
 void unity_putchar(int c)

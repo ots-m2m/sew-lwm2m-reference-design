@@ -391,7 +391,7 @@ __static bool interval_data_base_logger_record(interval_data_base_t *base_ptr, u
   uint8_t logger_write_pos = base_ptr->var.logger.write_pos;
   uint8_t logger_count     = base_ptr->var.logger.count;
 
-  log_err("Recording Interval: (UTC:%lu, IPeriod:%lu, SENSE:%lu)", (long unsigned) unix_epoch_timestamp, (long unsigned) interval_period, (long unsigned) new_sensor_value);
+  log_debug("Recording Interval: (UTC:%lu, IPeriod:%lu, SENSE:%lu)", (long unsigned) unix_epoch_timestamp, (long unsigned) interval_period, (long unsigned) new_sensor_value);
 
 
   /** Record (overwrite old records if full)
