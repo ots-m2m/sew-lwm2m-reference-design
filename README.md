@@ -1,44 +1,47 @@
-# Water Metering LwM2M Example Implementaiton
+# Water Metering LwM2M Example Implementation
 
-This project porvides an exmple implementation of the Water Metering related LWM2M objects specified by South East Water in Digital Utility IoT LwM2M Technical Specification v0.7. 
+This project provides an example implementation of the Water Metering related LWM2M objects specified by South East Water in Digital Utility IoT LwM2M Technical Specification v0.7.
 
 This example provides:
 
-1. LWM2M Security, LWM2M Server and Device objects as required to support device registration,1. Interval Data and Interval Data Delivery objects for one example channel (Water Mwter Flow Readings)1. Event Data and Event Data Delivery objects for one example event (Water Meter High Pressure Alarm).1. Delivery Schedule object as required to demonstrate scheduling of delivery for the Interval Data and Event Data delivery.
+1. LWM2M Security, LWM2M Server and Device objects as required to support device registration,
+1. Interval Data and Interval Data Delivery objects for one example channel (Water Meter Flow Readings)
+1. Event Data and Event Data Delivery objects for one example event (Water Meter High Pressure Alarm).
+1. Delivery Schedule object as required to demonstrate scheduling of delivery for the Interval Data and Event Data delivery.
 
-The intent of this project is to provide water meter vednors with a working model demnostrating the key design concepts that support the efficient delivery of water metering data using LwM2M. It does not seek to provide a complete Water Meter implementation, nor does it consider production features such as watchdogs, persistent sample and event storage, commisioning, network addressing etc. These capabilities are considered generic emebdded systems capbiltiies that are a  matter for the indivdiual water meter vendors to address. 
+The intent of this project is to provide water meter vendor with a working model demonstrating the key design concepts that support the efficient delivery of water metering data using LwM2M. It does not seek to provide a complete Water Meter implementation, nor does it consider production features such as watchdogs, persistent sample and event storage, commissioning, network addressing etc. These capabilities are considered generic embedded systems capabilities that are a  matter for the individual water meter vendors to address.
 
-It should also be noted that the water meters objects demonstrated here do not encompass the full breadth of features needed by system that are fully compliant of the specification, for example the Water Meter Flow Readings object only requires a single value per sample, other objects in the specification require multiple values per sample. It is a realtively trivial excerise to extended the base interval data object to support multiple values per samples.
+It should also be noted that the water meters objects demonstrated here do not encompass the full breadth of features needed by system that are fully compliant of the specification, for example the Water Meter Flow Readings object only requires a single value per sample, other objects in the specification require multiple values per sample. It is a relatively trivial exercise to extended the base interval data object to support multiple values per samples.
 
 ## Networking
-Networking is provides by a SLIP interface connected to a RaspberryPi that then routes the LwM2M UDP packets to a network. It does not attemt to demonstrate how to manage a cellular conenction such as NB-IoT Modem.
+Networking is provides by a SLIP interface connected to a RaspberryPi that then routes the LwM2M UDP packets to a network. It does not attempt to demonstrate how to manage a cellular connection such as NB-IoT Modem.
 
 ## MCU Resources
-This example implementation is not optimised for code space or memory use. In particular is makes use of the GCC libc standard library, including using malloc. For a production implementation the depednant functions would likley be replaced with more efficient implementations.
+This example implementation is not optimised for code space or memory use. In particular is makes use of the GCC libc standard library, including using malloc. For a production implementation the dependent functions would likely be replaced with more efficient implementations.
 
 ## Wakaam LwM2M Stack
-This project is built upon the Eclipse Wakaama LwM2M  implementation. Several enhacnements have been made to Wakaama to add support for confirmable GET and OBSERVE responses, and other defect fixes. These enhancements are provided in the wakaama.patch file, but ultimately these changes should be contributed back to the Wakaama project. 
+This project is built upon the Eclipse Wakaama LwM2M  implementation. Several enhancement have been made to Wakaama to add support for confirmable GET and OBSERVE responses, and other defect fixes. These enhancements are provided in the wakaama.patch file, but ultimately these changes should be contributed back to the Wakaama project.
 
-##Licensing
-This proejct is released under the terms of the Mozilla Public License, v. 2.0, the details can be found [here](http://mozilla.org/MPL/2.0/). 
+## Licensing
+This project is released under the terms of the Mozilla Public License, v. 2.0, the details can be found [here](http://mozilla.org/MPL/2.0/).
 
 Covered Software is provided under this License on an “as is” basis, without warranty of any kind, either expressed, implied, or statutory, including, without limitation, warranties that the Covered Software is free of defects, merchantable, fit for a particular purpose or non-infringing. The entire risk as to the quality and performance of the Covered Software is with You. Should any Covered Software prove defective in any respect, You (not any Contributor) assume the cost of any necessary servicing, repair, or correction. This disclaimer of warranty constitutes an essential part of this License. No use of any Covered Software is authorized under this License except under this disclaimer.
 
 # Building the example
-This demonstration uses MSP-TS430PZ100C-MSP430F643x 100-Pin Target board with an MSP430f6459 MCU installed. It is connected to a RaspberryPI (v3) via a UART, over which a SLIP network is created to allow the reference implementation to send and receive UDP packets to a network. 
+This demonstration uses MSP-TS430PZ100C-MSP430F643x 100-Pin Target board with an MSP430f6459 MCU installed. It is connected to a RaspberryPI (v3) via a UART, over which a SLIP network is created to allow the reference implementation to send and receive UDP packets to a network.
 
 ## Wiring Diagram
-The exmpample is wired per the following diagram.
+The example is wired per the following diagram.
 
 ![](wiring.png)
 
 ## Get This Repository
 
-First clone this repository and recursively initialise submodules. 
+First clone this repository and recursively initialised submodules.
 
 ```bash
-> cd ~/git/
-> git clone --recursive git@github.com:ots-m2m/sew-lwm2m-reference-design.git
+cd ~/git/
+git clone --recursive git@github.com:ots-m2m/sew-lwm2m-reference-design.git
 ```
 
 ## Setting Up Code Composer Studio
@@ -50,7 +53,7 @@ After installing the IDE. Head to the menu bar `file->import`. Then in the impor
 From here you can then open and import this project in `~/git/sew-lwm2m-reference-design`
 
 ## Configuring
-Open `sew_config.h` and set your server address and other configurations for your envionment.  
+Open `sew_config.h` and set your server address and other configurations for your environment.
 
 ## Building
 
@@ -122,9 +125,9 @@ IP address you think is your raspberry pi.
 sudo ping -f 192.168.1.194
 ```
 
-The ping paramter -f flag stands for flood mode. It will cause the green led of the affected raspbeerypi to blink fast.
+The ping parameter -f flag stands for flood mode. It will cause the green led of the affected raspberry-pi to blink fast.
 
-We use a slip modem to allow the reference board to access the LWM2M server. For details on the initial slattach and ifconfig setup and example logs. 
+We use a slip modem to allow the reference board to access the LWM2M server. For details on the initial slattach and ifconfig setup and example logs.
 
 The required steps are:
 
@@ -145,7 +148,7 @@ The required steps are:
 
         sudo ifconfig wlan0 down
 
-Once configured the exmmple board is reached on `192.168.5.2`.
+Once configured the example board is reached on `192.168.5.2`.
 
 
 # Doxygen Callgraphs
@@ -155,7 +158,7 @@ To view doxygen generated documentation. Run `./doxyopen`
 
 # Changes Needed To Design Document
 
-During this implementation serveral changes to the South East water specification were identified. These are listed here at a high level, a new revision of the specifcation will be drafted to incorporate these changes.
+During this implementation several changes to the South East water specification were identified. These are listed here at a high level, a new revision of the specification will be drafted to incorporate these changes.
 
 * Update alarm rate limit to be tracked via period window rather than via timestamp array. This would minimise memory resource usage on the client.
 
@@ -170,12 +173,12 @@ During this implementation serveral changes to the South East water specificatio
   - Can remove number of events in payload. This is since CBOR already includes a way of defining the number of entries in a CBOR array.
 
 * Also in Page 52 "Events and Alarm Payload Definition" we do not need any more these values. Since CBOR deals with it already:
-  - Number of events in Payload [8-bitinteger]
+  - Number of events in Payload [8-bit integer]
   - Number of Values Per Event  [8-bit integer]
   - Size of Value 1 in bits [8-bit integer]
   - Size of Value 2 in bits [8-bit integer]
 
-* The Number of Retries resource is inccorect (typo) in the design document and hence does not appear in the JSON or XML documents.
+* The Number of Retries resource is incorrect (typo) in the design document and hence does not appear in the JSON or XML documents.
 
 * Alarm Set Operator needs a value 0 for DISABLED and the other values changed accordingly.
 
@@ -183,13 +186,13 @@ During this implementation serveral changes to the South East water specificatio
 
 * Need to look at all object id in the design doc, many do not match the JSON.
 
-* Need to clarify the behviour of historical read, does it move the delivered pointer?
+* Need to clarify the behaviour of historical read, does it move the delivered pointer?
 
 * Need to clarify what to do when there are missing intervals.
 
 * Format of interval delivery may not be correct, do we need object and instance ID?
 
-* Interval data payload will always wrap each interval block warp in CBOR [] indefinate array. This minimises the need for custom logic to detect the end of one CBOR block from another in a payload stream, by pushing the handling to the CBOR parser (at the cost of two extra bytes). This helkps when there are skipped intervals, as the system will split the payload into multiple appended blocks.
+* Interval data payload will always wrap each interval block warp in CBOR [] indefinate array. This minimises the need for custom logic to detect the end of one CBOR block from another in a payload stream, by pushing the handling to the CBOR parser (at the cost of two extra bytes). This helps when there are skipped intervals, as the system will split the payload into multiple appended blocks.
 
 ## Interval Data Base Payload Changes
 
@@ -224,25 +227,25 @@ Where  a block should have
 
 # Demo Script
 
-The demonstration scripts provide a way to demonstrate the Interval Data and Event Data recording, aggregation and delivery. 
+The demonstration scripts provide a way to demonstrate the Interval Data and Event Data recording, aggregation and delivery.
 
 ## Interval Data Demonstration
 
-This demonstration creates a new Water Flow Readings instance to record random values every 5 seconds. It then creates a 60 second Delivery Scehdule and an Interval Data Delivery instance to deliver the data every 60 seconds (with random delay).
+This demonstration creates a new Water Flow Readings instance to record random values every 5 seconds. It then creates a 60 second Delivery Schedule and an Interval Data Delivery instance to deliver the data every 60 seconds (with random delay).
 
 The demonstration script is as follows:
 
 ```
 Setup the device
   ✓ Should set the time (Write to urn:slip:1234567890/3/0/13) (73ms)
-   
+
 Setup Water Flow Readings for 5 Seconds Recording and 60 second reporting
   ✓ Should create a new Water Flow Readings Instance (Create on urn:slip:1234567890/8010) (92ms)
   ✓ Should configure the Water Flow Reading Instance with 5 second recording (Execute on urn:slip:1234567890/8010/3/9010) (102ms)
   ✓ Should start recording Water Flow Readings (Execute on urn:slip:1234567890/8010/3/4011) (54ms)
   ✓ Should create the 60 seconds Delivery Schedule Instance (Create on urn:slip:1234567890/8004) (140ms)
   ✓ Should create the Interval Data Delivery Instance 2 (Create on urn:slip:1234567890/8002) (111ms)
-  ✓ Should observe the Latest Payload resource on Interval Data Delivery instance 2 (Observe on urn:slip:1234567890/8002/2/2) (87ms)   
+  ✓ Should observe the Latest Payload resource on Interval Data Delivery instance 2 (Observe on urn:slip:1234567890/8002/2/2) (87ms)
 ```
 
 Once this is configured the device reports interval data in CBOR encoded payloads every 60s (+random delay) as shown in our server logs
@@ -256,19 +259,19 @@ gtcoregw_1      | 2017-07-27 23:08:14,344 INFO EventServlet$ClientCoapListener -
 gtcoregw_1      | 2017-07-27 23:08:14,347 INFO EventServlet$ClientCoapListener - {"timestamp":1501196894347,"incoming":false,"type":"ACK","mId":26745,"token":"","port":0,"dir":"SEN
 ```
 
-By inspecting this log, we can see the TLV payload for the resource /8002/2/2 which is the Latest Paylod reosurce on our Interval Data Delivery instance
+By inspecting this log, we can see the TLV payload for the resource /8002/2/2 which is the Latest Payload resources on our Interval Data Delivery instance
 
 ```
 880243480040029f191f4a039f9f1a597a764e059f9f08ff9f07ff9f08ff9f07ff9f08ff9f08ff9f07ff9f06ff9f06ff9f05ff9f05ff9f06ff9f06ff9f05ff9f05ffffffffff
 ```
 
-This paylod is TLV encoded, after removing the TLV header we get the opaque bytes
+This payload is TLV encoded, after removing the TLV header we get the opaque bytes
 
 ```
 029f191f4a039f9f1a597a764e059f9f08ff9f07ff9f08ff9f07ff9f08ff9f08ff9f07ff9f06ff9f06ff9f05ff9f05ff9f06ff9f06ff9f05ff9f05ffffffffff
 ```
 
-Noting that with the 4013 reosurce, the first byte tells us the encoding, in this case 0x02 tells us it is cbor. Passing this data to a [CBOR decoder](cbor.me) we get:
+Noting that with the 4013 resources, the first byte tells us the encoding, in this case 0x02 tells us it is cbor. Passing this data to a [CBOR decoder](cbor.me) we get:
 
 ```
 [8010, 3, [[1501197902, 5, [[8], [7], [8], [7], [8], [8], [7], [6], [6], [5], [5], [6], [6], [5], [5]]]]]
@@ -278,7 +281,7 @@ This is a correctly formatted CBOR interval data stream with a single value per 
 
 ## Event Data Demonstration
 
-The Event Data Demonstration created three instances of the Water Meter High Pressure Alarm object and confogures them as a Current State, Change Log and Event log types. The demonstration  creates a series of events using a test LWM2M object. 
+The Event Data Demonstration created three instances of the Water Meter High Pressure Alarm object and configure them as a Current State, Change Log and Event log types. The demonstration  creates a series of events using a test LWM2M object.
 
 The demonstration script is as follows:
 
@@ -287,8 +290,8 @@ Setup the device
   ✓ Should set the time (Write to urn:slip:1234567890/3/0/13) (124ms)
 Setup Water High Pressure Alarms with 60 second reporting
   ✓ Should create a new Water High Pressure Current State Instance (Create on urn:slip:1234567890/8024)
-  ✓ Should create a new Water High Pressure Change Log Instance (Create on urn:slip:1234567890/8024) 
-  ✓ Should create a new Water High Pressure Event Log Instance (Create on urn:slip:1234567890/8024) 
+  ✓ Should create a new Water High Pressure Change Log Instance (Create on urn:slip:1234567890/8024)
+  ✓ Should create a new Water High Pressure Event Log Instance (Create on urn:slip:1234567890/8024)
   ✓ Should create the 60 seconds Delivery Schedule Instance (Create on urn:slip:1234567890/8004) (227ms)
   ✓ Should create the Event Data Delivery Instance (Create on urn:slip:1234567890/8003) (157ms)
   1) Should observe the Latest Payload resource on Event Data Delivery instance 1 (Observe on urn:slip:1234567890/8003/1/2)
@@ -297,8 +300,8 @@ Setup Water High Pressure Alarms with 60 second reporting
 Once this is configured the device reports event data in CBOR encoded payloads every 60s (+random delay) as shown in our server logs.
 
 ```
-0=0,2,9,f,1,8,6,9,1,a,5,9,7,a,c,3,c,6,0,1,0,0,f,f, 
-1=0,2,9,f,1,8,6,9,0,2,9,f,9,f,1,a,5,9,7,a,c,3,c,6,9,f,0,1,1,8,6,4,f,f,f,f,9,f,1,a,5,9,7,a,c,3,c,6,9,f,0,0,0,2,f,f,f,f,f,f,f,f, 
+0=0,2,9,f,1,8,6,9,1,a,5,9,7,a,c,3,c,6,0,1,0,0,f,f,
+1=0,2,9,f,1,8,6,9,0,2,9,f,9,f,1,a,5,9,7,a,c,3,c,6,9,f,0,1,1,8,6,4,f,f,f,f,9,f,1,a,5,9,7,a,c,3,c,6,9,f,0,0,0,2,f,f,f,f,f,f,f,f,
 2=0,2,9,f,1,8,6,9,0,3,9,f,9,f,1,a,5,9,7,a,c,3,
 ```
 
@@ -313,13 +316,13 @@ The logs show 3 TLV resources, one for each of the High Water Pressure Alarm ins
 
 # Limitations
 
-- If you conduct an object level read, the confirmation is not processed leading to the payload pointers not being updated. Work araound is to perform a read on the resource level.
+- If you conduct an object level read, the confirmation is not processed leading to the payload pointers not being updated. Work around is to perform a read on the resource level.
 
 - Can't clear an object link on a resource, it must always have a value.
 
 - When setting object links no error is returned if the link points to an invalid resource.
 
-- For the demonstration we use a RaspberryPI with SLIP via a NAT network, the NAT times out afer 30 seconds of innactivity rendering the client inaccessbile from the server. Workaroud is to restart the client. 
+- For the demonstration we use a RaspberryPI with SLIP via a NAT network, the NAT times out after 30 seconds of inactivity rendering the client inaccessible from the server. Work around is to restart the client.
 
 - NTP is not implemented as required by the SEW specification, instead we set time using the time resource on device.
 
@@ -329,8 +332,8 @@ The logs show 3 TLV resources, one for each of the High Water Pressure Alarm ins
 
 - Cannot re-use delivery schedule instances across different delivery objects due to confirmation and retry tracking. Workaround is to create different delivery schedule instances for every delivery object.
 
-- Reading at the object level delivers payload data but it does NOT advance the delivered pointers. Workaround is to read at the resource level to advance delviery pointers.
+- Reading at the object level delivers payload data but it does NOT advance the delivered pointers. Workaround is to read at the resource level to advance delivery pointers.
 
-- The Latest Payload on Interval Data Delivery objects deliver the paylaod as a TLV within a TLV. This is because the payload is an opaque which requires a TLV and it's a multiple resource which also requires a TLV. This is a waste if a few bytes so we should investigate of there is an alternative to this. 
+- The Latest Payload on Interval Data Delivery objects deliver the payload as a TLV within a TLV. This is because the payload is an opaque which requires a TLV and it's a multiple resource which also requires a TLV. This is a waste if a few bytes so we should investigate of there is an alternative to this.
 
-- The patch that is applied to Wakaama should be contributed back to the Wakaama project main source. 
+- The patch that is applied to Wakaama should be contributed back to the Wakaama project main source.

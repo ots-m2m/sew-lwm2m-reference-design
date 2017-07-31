@@ -255,7 +255,7 @@ void test_interval_data_overall(void)
     mock_value += 1;
   }
 
-#if 1 // TODO: Currently Just visual inspection, but lets try to convert this into unit test as well. Oh and maybe check the handler logic as well
+#if 0 // TODO: Currently Just visual inspection, but lets try to convert this into unit test as well. Oh and maybe check the handler logic as well
       // Currently there is an issue with the payload generation if its too big
       // Checkout what the payload looks like
   cbor_stream_t *stream = &(mock_base.var.payload.stream);
@@ -384,7 +384,7 @@ void interval_data_tests_run(void)
   RUN_TEST(test_interval_data_base_cbor_payload_basic);
   RUN_TEST(test_interval_data_base_cbor_payload_empty);
   RUN_TEST(test_interval_data_base_cbor_payload_missing_interval);
-  //RUN_TEST(test_interval_data_overall);
+  RUN_TEST(test_interval_data_overall);
 
   test_interval_data_visual();
 

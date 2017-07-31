@@ -324,10 +324,13 @@ void test_delivery_schedule_initial_state_check(void)
   uint32_t period_s = 0; // Delivery Freqency
   uint32_t intervals_ahead_s = 1; // Intervals Ahead
   uint32_t utc_offset_s = utc_offset_parse(DEFAULT_SCHEDULE_UTC_OFFSET);
+  (void) intervals_ahead_s; // Used in log_debug
 
 
   { // Before Midnight
+#ifdef TEST_DELIVERY_SCHEDULE_DEBUG_MODE
     log_debug("2 hour before midnight");
+#endif
 
     period_s = 86400; // Delivery Freqency
     offset_s = 0; // Start Time
@@ -357,10 +360,12 @@ void test_delivery_schedule_initial_state_check(void)
     // Initial State
     Delivery_Schedule_tick(mock_unix_time);
     till_next_tx_s = Delivery_Schedule_Diagnostics(instance, mock_unix_time, &next_tx_s, &next_win_s, &next_retry_s, &retry_count, &transmission_active, &transmission_confirmed);
+#ifdef TEST_DELIVERY_SCHEDULE_DEBUG_MODE
     log_debug("next TX in %luhr (%lumins)", till_next_tx_s/(60*60), till_next_tx_s/60);
     log_debug("time:%05lu offset:%lu period:%lu num_intervals_ahead:%lu --> GET_INTERVAL_TIME:%lu", (long unsigned) mock_unix_time, (long unsigned) offset_s, (long unsigned) period_s, (long unsigned) intervals_ahead_s, (long unsigned) GET_INTERVAL_TIME(mock_unix_time, offset_s, period_s, intervals_ahead_s));
     log_debug("next_win_s:%lu, transmission_active:%d, transmission_confirmed:%d", (long unsigned) next_win_s, (int) transmission_active, (int) transmission_confirmed);
     log_debug("next_transmit_window_s:%lu, GET_INTERVAL_TIME:%lu", (long unsigned)(mock_unix_time+next_win_s+utc_offset_s), (long unsigned) GET_INTERVAL_TIME(mock_unix_time, offset_s, period_s, intervals_ahead_s));
+#endif
 
     /*
       ```
@@ -378,7 +383,9 @@ void test_delivery_schedule_initial_state_check(void)
   }
 
   { // Before Midnight
+#ifdef TEST_DELIVERY_SCHEDULE_DEBUG_MODE
     log_debug("2 hour after midnight");
+#endif
 
     period_s = 86400; // Delivery Freqency
     offset_s = 0; // Start Time
@@ -408,11 +415,12 @@ void test_delivery_schedule_initial_state_check(void)
     // Initial State
     Delivery_Schedule_tick(mock_unix_time);
     till_next_tx_s = Delivery_Schedule_Diagnostics(instance, mock_unix_time, &next_tx_s, &next_win_s, &next_retry_s, &retry_count, &transmission_active, &transmission_confirmed);
+  #ifdef TEST_DELIVERY_SCHEDULE_DEBUG_MODE
     log_debug("next TX in %luhr (%lumins)", till_next_tx_s/(60*60), till_next_tx_s/60);
     log_debug("time:%05lu offset:%lu period:%lu num_intervals_ahead:%lu --> GET_INTERVAL_TIME:%lu", (long unsigned) mock_unix_time, (long unsigned) offset_s, (long unsigned) period_s, (long unsigned) intervals_ahead_s, (long unsigned) GET_INTERVAL_TIME(mock_unix_time, offset_s, period_s, intervals_ahead_s));
     log_debug("next_win_s:%lu, transmission_active:%d, transmission_confirmed:%d", (long unsigned) next_win_s, (int) transmission_active, (int) transmission_confirmed);
     log_debug("next_transmit_window_s:%lu, GET_INTERVAL_TIME:%lu", (long unsigned)(mock_unix_time+next_win_s+utc_offset_s), (long unsigned) GET_INTERVAL_TIME(mock_unix_time, offset_s, period_s, intervals_ahead_s));
-
+#endif
 
     /*
       ```
