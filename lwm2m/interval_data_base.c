@@ -86,6 +86,16 @@ static interval_data_base_t *interval_data[INTERVAL_DATA_BASE_INSTANCES_MAX] = {
   ///<  Index corresponds to objects registered by
   ///<    interval_data_base_initalise_instance()
 
+
+typedef struct interval_data_base_payload_ref_block_t
+{ /* This is used to represent a found block */
+  uint32_t timestamp;
+  uint32_t interval_period;
+  uint8_t  interval_count;
+  uint32_t first_interval_index;
+} interval_data_base_payload_ref_block_t;
+
+
 /*******************************************************************************
 *******************************************************************************/
 
@@ -444,10 +454,10 @@ __static bool interval_data_base_logger_record(interval_data_base_t *base_ptr, u
 
 
 /**-----------------------------------------------------------------------------
-  Logger Payload Append Block
+  Logger Payload Search For Block
 
   This is used by interval_data_base_logger_generate_payload_historical()
-  to generate and append a CBOR block to the Historical Payload.
+  to search for entries to insert into a CBOR block for the Historical Payload.
 
   Design Note: This is required since in page 37, on "Latest Payload" in
                 `Digital Utility IoT LwM2M Technical Specification v0.7`
@@ -475,16 +485,16 @@ __static bool interval_data_base_logger_record(interval_data_base_t *base_ptr, u
     - log_entry_scan_index : last entry that was checked against
 
 ------------------------------------------------------------------------------*/
-__static bool interval_data_base_logger_generate_payload_historical_append_block(
+__static bool interval_data_base_logger_generate_payload_historical_search_block(
                   interval_data_base_t *base_ptr,
-                  const uint32_t first_interval_timestamp_s,  ///< input : number of seconds since Jan 1st, 1970 in the UTC time zone
-                  const uint32_t last_interval_timestamp_s,   ///< input : number of seconds since Jan 1st, 1970 in the UTC time zone
-                  uint32_t *oldest_timestamp_s,               ///< output : number of seconds since Jan 1st, 1970 in the UTC time zone
-                  uint32_t *newest_timestamp_s,               ///< output : number of seconds since Jan 1st, 1970 in the UTC time zone
+                  const uint32_t first_interval_timestamp_s,        ///< input  : number of seconds since Jan 1st, 1970 in the UTC time zone
+                  const uint32_t last_interval_timestamp_s,         ///< input  : number of seconds since Jan 1st, 1970 in the UTC time zone
+                  uint32_t *oldest_timestamp_s,                     ///< output : number of seconds since Jan 1st, 1970 in the UTC time zone
+                  uint32_t *newest_timestamp_s,                     ///< output : number of seconds since Jan 1st, 1970 in the UTC time zone
                   /* Special Handling Of Inconsistent Period */
-                  uint16_t *entry_written_count,  ///< input/output
-                  uint16_t *log_entry_scan_index, ///< input/output
-                  bool     *incomplete_read       ///< output
+                  uint16_t *log_entry_scan_index,                   ///< input/output
+                  bool     *incomplete_read,                        ///< output
+                  interval_data_base_payload_ref_block_t *block_ref ///< output
                 )
 {
   interval_data_base_log_entries_t *log_entry_ptr = NULL;
@@ -496,19 +506,16 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
   uint32_t expected_interval_period = 0;
 
   uint32_t entry_timestamp       = 0;
-  uint32_t entry_sensor_value    = 0;
   uint32_t entry_interval_period = 0;
 
-  bool     error = false;
-  bool     header_generated = false;
+  bool     block_exist = false; /* At least one entry found */
 
-  assert(entry_written_count);
   assert(log_entry_scan_index);
   assert(incomplete_read);
+  assert(block_ref);
 
-  /** Record Stream Pos For Reverting Broken Blocks
-  ***************************************************/
-  const size_t init_stream_pos = base_ptr->var.payload.stream.pos;
+  block_ref->interval_count = 0; /* Interval Count of Zero means empty block */
+
 
   /** Scan though logger from Old to New datum
   *********************************************/
@@ -524,7 +531,6 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
 
     // Get Entry Values
     entry_timestamp       = log_entry_ptr->timestamp;
-    entry_sensor_value    = (uint32_t) log_entry_ptr->sensor_value;
     entry_interval_period = log_entry_ptr->interval_period;
 
 #if INTERVAL_DATA_BASE_VERBOSE_DEBUG
@@ -555,7 +561,7 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
     }
 
     /** Verify Validity Of Log Entry Timestamp **/
-    if (header_generated)
+    if (block_exist)
     { /** This kicks in after the header and the first entry is appended **/
       if (entry_timestamp > prev_entry_timestamp)
       { /** Check if interval increment within acceptable range **/
@@ -572,19 +578,22 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
       else
       { /* Timestamp must always be increasing */
         log_err("log entry timestamp must always be increasing");
-        error = true;
-        break;
+        return false;
       }
 
       prev_entry_timestamp = entry_timestamp;
     }
 
-    /** Payload Construction **/
+    /** Block Reference Construction **/
 
-    if (!header_generated)
+    if (!block_exist)
     { // Generate the payload header on first detected entry
-      error = interval_data_base_payload_head(base_ptr, entry_timestamp, entry_interval_period) ? error : true;
-      header_generated = true;
+      block_exist = true;
+
+      // Setup interval block metadata
+      block_ref->timestamp = entry_timestamp;
+      block_ref->interval_period = entry_interval_period;
+      block_ref->first_interval_index = entry_index;
 
       // Report this oldest timestamp found
       if (oldest_timestamp_s)
@@ -598,29 +607,58 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
     }
 
     // Add Entry To Payload
-    error = interval_data_base_payload_add_interval(base_ptr, entry_sensor_value) ? error : true;
-
-    // Exit if no more entries allowed
-    *entry_written_count = *entry_written_count + 1;
-    if (*entry_written_count >= INTERVAL_DATA_BASE_PAYLOAD_MAX_ENTRIES)
-    {
-      log_debug("found too many to fit in payload");
-      break; // Stop scanning
-    }
-  }
+    (block_ref->interval_count)++;
+  } /* End of Loop */
 
   *log_entry_scan_index = entry_index;
 
-  if (header_generated)
-  { // Footer
-    error = interval_data_base_payload_footer(base_ptr) ? error : true;
+  return true;
+}
 
-    // Report this newest timestamp found
-    if (newest_timestamp_s)
-    {
-      *newest_timestamp_s = entry_timestamp;
-    }
+
+
+/**-----------------------------------------------------------------------------
+  Logger Payload Search For Block
+
+  This is used by interval_data_base_logger_generate_payload_historical()
+  to generate a CBOR block based on block_ref data.
+
+------------------------------------------------------------------------------*/
+__static bool interval_data_base_logger_generate_payload_historical_append_block(
+                  interval_data_base_t *base_ptr,
+                  interval_data_base_payload_ref_block_t *block_ref /* Generate Payload */
+                )
+{
+
+  uint16_t logger_read_pos  = base_ptr->var.logger.read_pos;
+  bool     error = false;
+
+  assert(base_ptr);
+  assert(block_ref);
+
+  /** Record Stream Pos For Reverting Broken Blocks
+  ***************************************************/
+  const size_t init_stream_pos = base_ptr->var.payload.stream.pos;
+
+  error = interval_data_base_payload_head(base_ptr, block_ref->timestamp, block_ref->interval_period) ? error : true;
+
+  /** Scan though logger from Old to New datum
+  *********************************************/
+  for (uint16_t entry_index = block_ref->first_interval_index ; entry_index < block_ref->interval_count ; entry_index++)
+  {
+
+    uint16_t logger_pos = (logger_read_pos + entry_index) % PAYLOAD_VALUE_COUNT_MAX; // Index
+
+    interval_data_base_log_entries_t *log_entry_ptr = &base_ptr->var.logger.entries[logger_pos];
+
+    // Get Entry Values
+    uint32_t entry_sensor_value = (uint32_t) log_entry_ptr->sensor_value;
+
+    // Add Entry To Payload
+    error = interval_data_base_payload_add_interval(base_ptr, entry_sensor_value) ? error : true;
   }
+
+  error = interval_data_base_payload_footer(base_ptr) ? error : true;
 
   if (error)
   { /* CBOR Block Write Failed */
@@ -689,9 +727,62 @@ __static bool interval_data_base_logger_generate_payload_historical(
     return false;
   }
 
+
+  /** Scan Log Entries For As Many Interval Blocks
+  *************************************************/
+  uint16_t log_entry_scan_index = 0;
+  uint8_t  block_count = 0;
+  interval_data_base_payload_ref_block_t block_metadata[5];
+  const uint8_t block_metadata_max = sizeof(block_metadata)/sizeof(block_metadata[0]);
+
+  for (int block_index = 0 ; block_index < block_metadata_max ; block_index++)
+  { /* Scan and request a block */
+    bool incomplete_read = false;
+    uint32_t block_oldest_timestamp_s;
+    uint32_t block_newest_timestamp_s;
+
+    result = interval_data_base_logger_generate_payload_historical_search_block(
+                base_ptr, first_interval_timestamp_s, last_interval_timestamp_s,  /* Inputs */
+                &block_oldest_timestamp_s, &block_newest_timestamp_s, /* Outputs */
+                /* Special Handling Of Inconsistent Period */
+                &log_entry_scan_index,
+                &incomplete_read,
+                &(block_metadata[block_index])
+              );
+
+    /* Stop loop on fatal error */
+    if (!result) return false;
+
+    /* Break Loop If Empty */
+    if (block_metadata[block_index].interval_count == 0) break;
+
+    /* If interval found in block then we have plus one valid block */
+    block_count++;
+
+    /* Initial Block Behaviour*/
+    if (block_index == 0)
+    { // Record oldest timestamp captured
+      if (oldest_timestamp_s)
+      {
+        *oldest_timestamp_s = block_oldest_timestamp_s;
+      }
+    }
+
+    /* All block behaviour */
+    if (newest_timestamp_s)
+    { // Record newest valid timestamp that was captured
+      *newest_timestamp_s = block_newest_timestamp_s;
+    }
+
+    /* Check if completed */
+    if (!incomplete_read) break;
+
+    log_debug("gen extra block %d (%u, %u)", block_index, log_entry_scan_index, entry_written_count);
+  }
+
   /** Payload Container Start
   *******************************************/
-  cbor_result = cbor_serialize_array_indefinite(stream);
+  cbor_result = cbor_serialize_array(stream, 2 + block_count );
   if (!cbor_result)
   {
     log_err("Could not open payload container");
@@ -712,81 +803,17 @@ __static bool interval_data_base_logger_generate_payload_historical(
     return false;
   }
 
-  /** Blocks Array Open
-  *******************************************/
-  cbor_result = cbor_serialize_array_indefinite(stream);
-  if (!cbor_result)
-  {
-    log_err("Could not open block array");
-    return false;
-  }
-
-  /** Generate As Many Interval Blocks As Required
-  *************************************************/
-  uint16_t log_entry_scan_index = 0;
-  uint16_t entry_written_count = 0;
-
-  for (int block = 0 ; block < 5 ; block++)
+  for (int block_index = 0 ; block_index < block_count ; block_index++)
   { /* Scan and construct a CBOR block for the payload */
-    bool incomplete_read = false;
-    uint32_t block_oldest_timestamp_s;
-    uint32_t block_newest_timestamp_s;
+    cbor_result = interval_data_base_logger_generate_payload_historical_append_block(
+                      base_ptr,
+                      &(block_metadata[block_index])
+                    );
 
-    result = interval_data_base_logger_generate_payload_historical_append_block(
-                base_ptr, first_interval_timestamp_s, last_interval_timestamp_s,  /* Inputs */
-                &block_oldest_timestamp_s, &block_newest_timestamp_s, /* Outputs */
-                /* Special Handling Of Inconsistent Period */
-                &entry_written_count,
-                &log_entry_scan_index,
-                &incomplete_read
-              );
-
-    /* Stop loop on fatal error */
-    if (!result) break;
-
-    /* Initial Block Behaviour*/
-    if (block == 0)
-    { // Record oldest timestamp captured
-      if (oldest_timestamp_s)
-      {
-        *oldest_timestamp_s = block_oldest_timestamp_s;
-      }
-    }
-
-    /* All block behaviour */
-    if (newest_timestamp_s)
-    { // Record newest valid timestamp that was captured
-      *newest_timestamp_s = block_newest_timestamp_s;
-    }
-
-    /* Check if completed */
-    if (!incomplete_read)
-    { /* Completed */
-      break;
-    }
-
-    log_debug("gen extra block %d (%u, %u)", block, log_entry_scan_index, entry_written_count);
+    if (!cbor_result) return false;
   }
 
-  /** Blocks Array Close
-  *******************************************/
-  cbor_result = cbor_write_break(stream);
-  if (!cbor_result)
-  {
-    log_err("Could not close blocks array");
-    return false;
-  }
-
-  /** Payload Container Close
-  *******************************************/
-  cbor_result = cbor_write_break(stream);
-  if (!cbor_result)
-  {
-    log_err("Could not close payload container");
-    return false;
-  }
-
-  return result;
+  return true;
 }
 
 /*******************************************************************************
