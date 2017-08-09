@@ -210,21 +210,22 @@ __static bool interval_data_base_payload_init(interval_data_base_t *base_ptr)
   return true;
 }
 
-__static bool interval_data_base_payload_head(interval_data_base_t *base_ptr, const uint32_t first_interval_timestamp, const uint32_t interval_time_period)
+__static bool interval_data_base_payload_head(interval_data_base_t *base_ptr, const uint32_t first_interval_timestamp, const uint32_t interval_time_period, const uint16_t interval_count )
 {
   assert(base_ptr);
   cbor_stream_t *stream = &(base_ptr->var.payload.stream);
   bool result = true;
 
+  result = cbor_serialize_array(stream, 3) ? result : false;
+
   // Start of CBOR array (Mandatory for all payload types)
-  result = cbor_serialize_array_indefinite(stream) ? result : false;
   result = cbor_serialize_uint64_t(stream, first_interval_timestamp) ? result : false;  // Timestamp serialisation needs the large version since it is more than 16bits
   result = cbor_serialize_uint64_t(stream, interval_time_period) ? result : false;      // Period may require more than 16bits if the interval sampling takes more than a day
 
   log_debug("head:: tstamp:%lu, tperiod:%lu", (long unsigned) first_interval_timestamp, (long unsigned) interval_time_period);
 
   // Start of CBOR interval array
-  result = cbor_serialize_array_indefinite(stream) ? result : false;
+  result = cbor_serialize_array(stream, interval_count) ? result : false;
 
   // We need to keep note of this variable
   base_ptr->var.payload.interval_time_period = interval_time_period;
@@ -237,6 +238,7 @@ __static bool interval_data_base_payload_add_interval(interval_data_base_t *base
   assert(base_ptr);
   cbor_stream_t *stream = &(base_ptr->var.payload.stream);
   bool result = true;
+  uint16_t value_count = 1;
 
   // Payload State
   uint32_t interval_time_period = base_ptr->var.payload.interval_time_period;
@@ -246,9 +248,12 @@ __static bool interval_data_base_payload_add_interval(interval_data_base_t *base
   log_debug("adding interval to payload: value:%lu stream(pos:%lu, size:%lu)", (long unsigned) input_interval_value, (long unsigned) stream->pos, (long unsigned) stream->size);
 #endif
 
-  /** Entry Open
-  ****************/
-  result = cbor_serialize_array_indefinite(stream) ? result : false; // Start of an Interval Entry
+  /** Interval Open
+  ******************/
+  if (value_count > 1)
+  { /* Only needed if we have more than one value per interval */
+    result = cbor_serialize_array(stream, value_count) ? result : false; // Start of an Interval Entry
+  }
 
   /** Encode Value(s)
   ********************/
@@ -272,9 +277,6 @@ __static bool interval_data_base_payload_add_interval(interval_data_base_t *base
 
   result = cbor_serialize_int(stream, interval_value) ? result : false;
 
-  /** Entry Close
-  ****************/
-  result = cbor_write_break(stream) ? result : false; // End of an Interval Entry
 
   return result;  // False if failed (e.g. no space left)
 }
@@ -282,11 +284,7 @@ __static bool interval_data_base_payload_add_interval(interval_data_base_t *base
 __static bool interval_data_base_payload_footer(interval_data_base_t *base_ptr)
 {
   assert(base_ptr);
-  cbor_stream_t *stream = &(base_ptr->var.payload.stream);
   bool result = true;
-
-  result = cbor_write_break(stream) ? result : false;
-  result = cbor_write_break(stream) ? result : false;
 
   return result;  // False if failed to write footer (e.g. no buffer)
 }
@@ -629,9 +627,8 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
                   interval_data_base_payload_ref_block_t *block_ref /* Generate Payload */
                 )
 {
-
-  uint16_t logger_read_pos  = base_ptr->var.logger.read_pos;
   bool     error = false;
+  uint16_t logger_read_pos = block_ref->first_interval_index;
 
   assert(base_ptr);
   assert(block_ref);
@@ -640,14 +637,13 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
   ***************************************************/
   const size_t init_stream_pos = base_ptr->var.payload.stream.pos;
 
-  error = interval_data_base_payload_head(base_ptr, block_ref->timestamp, block_ref->interval_period) ? error : true;
+  error = interval_data_base_payload_head(base_ptr, block_ref->timestamp, block_ref->interval_period, block_ref->interval_count) ? error : true;
 
   /** Scan though logger from Old to New datum
   *********************************************/
-  for (uint16_t entry_index = block_ref->first_interval_index ; entry_index < block_ref->interval_count ; entry_index++)
+  for (uint16_t interval_index = 0; interval_index < block_ref->interval_count ; interval_index++)
   {
-
-    uint16_t logger_pos = (logger_read_pos + entry_index) % PAYLOAD_VALUE_COUNT_MAX; // Index
+    uint16_t logger_pos = (logger_read_pos + interval_index) % PAYLOAD_VALUE_COUNT_MAX; // Index
 
     interval_data_base_log_entries_t *log_entry_ptr = &base_ptr->var.logger.entries[logger_pos];
 
@@ -805,6 +801,7 @@ __static bool interval_data_base_logger_generate_payload_historical(
 
   for (int block_index = 0 ; block_index < block_count ; block_index++)
   { /* Scan and construct a CBOR block for the payload */
+    log_debug("Gen Payload Block %u | interval count: %u | first index: %u", block_index, block_metadata[block_index].interval_count, block_metadata[block_index].first_interval_index);
     cbor_result = interval_data_base_logger_generate_payload_historical_append_block(
                       base_ptr,
                       &(block_metadata[block_index])
