@@ -60,7 +60,7 @@ typedef struct event_and_alarm_base_payload_t
 typedef double  (*get_value_func_t)(uint16_t instance_id);
 
 // Append event to stream
-typedef void (*payload_append_event_func_t)(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state);
+typedef void (*payload_append_event_func_t)(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state);
 
 // Alarm Getter Function Types
 typedef uint8_t (*bool_get_func_t     )(uint16_t instance, bool *val);
@@ -223,7 +223,7 @@ bool event_and_alarm_base_payload_init(event_and_alarm_base_t *base_ptr);
 bool event_and_alarm_base_payload_event_type_check(event_and_alarm_base_t *base_ptr);
 
 // Payload Head
-bool event_and_alarm_base_payload_head(event_and_alarm_base_t *base_ptr);
+bool event_and_alarm_base_payload_head(event_and_alarm_base_t *base_ptr, const uint16_t logger_count);
 
 // Payload Body
 bool event_and_alarm_base_payload_alarm_current_state_generate(event_and_alarm_base_t *base_ptr, uint32_t timestamp, double new_sensor_value, bool new_alarm_state);

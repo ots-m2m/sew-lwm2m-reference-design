@@ -40,8 +40,8 @@
  */
 extern lwm2m_object_declaration_t Water_Meter_High_Pressure_Alarm_object_declaration;
 
-static void Water_Meter_High_Pressure_Alarm_Payload_Alarm_State_Change_Log_append(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state);
-static void Water_Meter_High_Pressure_Alarm_Payload_Event_Log_append(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state);
+static void Water_Meter_High_Pressure_Alarm_Payload_Alarm_State_Change_Log_append(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state);
+static void Water_Meter_High_Pressure_Alarm_Payload_Event_Log_append(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state);
 
 double Water_Meter_High_Pressure_Alarm_get_value(uint16_t instance_id);
 
@@ -67,15 +67,17 @@ static event_and_alarm_base_t *event_and_alarm_instance[] = {
 /*******************************************************************************
 *******************************************************************************/
 
-__static void Water_Meter_High_Pressure_Alarm_Payload_Alarm_State_Change_Log_append(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state)
+__static void Water_Meter_High_Pressure_Alarm_Payload_Alarm_State_Change_Log_append(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state)
 {
-  cbor_serialize_int(stream, new_alarm_state);
+  cbor_serialize_array(stream, 2);
+  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
   cbor_serialize_int(stream, (uint16_t) new_sensor_value);
 }
 
-__static void Water_Meter_High_Pressure_Alarm_Payload_Event_Log_append(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state)
+__static void Water_Meter_High_Pressure_Alarm_Payload_Event_Log_append(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state)
 {
-  cbor_serialize_int(stream, new_alarm_state);
+  cbor_serialize_array(stream, 2);
+  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
   cbor_serialize_int(stream, (uint16_t) new_sensor_value);
 }
 

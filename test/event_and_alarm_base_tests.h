@@ -12,5 +12,6 @@
 void event_and_alarm_tests_run(void);
 
 //#define UNIT_TEST_PAYLOAD_DATA_DUMP
+//#define DISABLE_EVENT_AND_ALARM_TEST_ASSERTS
 
 #endif /* TEST_EVENT_AND_ALARM_BASE_TESTS_H_ */

@@ -15,6 +15,14 @@ lwm2m_object_declaration_t mock_object_declaration;
 
 #define COAP_205_CONTENT                (uint8_t)0x45
 
+#ifdef  DISABLE_EVENT_AND_ALARM_TEST_ASSERTS
+#undef  TEST_ASSERT_TRUE
+#define TEST_ASSERT_TRUE(X) do {X;} while(0);
+#undef  TEST_ASSERT_FALSE
+#define TEST_ASSERT_FALSE(X) do {X;} while(0);
+#undef  TEST_ASSERT_EQUAL_INT8_ARRAY
+#define  TEST_ASSERT_EQUAL_INT8_ARRAY(...)
+#endif
 
 static double mock_value = 0.0;
 static double mock_get_value(uint16_t instance)
@@ -92,16 +100,18 @@ DECLARE_MOCK_FUNC_BOOL(      mock_alarm_realtime  , false     ,  mock_Alarm_Real
 DECLARE_MOCK_FUNC_INTEGER(   mock_event_code      ,  0        ,  mock_Event_Code_get              ,    mock_Event_Code_set              );
 
 
-static void mock_Payload_Alarm_State_Change_Log_append(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state)
+static void mock_Payload_Alarm_State_Change_Log_append(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state)
 {
+  cbor_serialize_array(stream, 2);
+  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
   cbor_serialize_int(stream, (uint16_t) new_sensor_value);
-  cbor_serialize_int(stream, new_alarm_state);
 }
 
-static void mock_Payload_Event_Log_append(cbor_stream_t *stream, double new_sensor_value, bool new_alarm_state)
+static void mock_Payload_Event_Log_append(cbor_stream_t *stream, uint32_t timestamp, double new_sensor_value, bool new_alarm_state)
 {
+  cbor_serialize_array(stream, 2);
+  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
   cbor_serialize_int(stream, (uint16_t) new_sensor_value);
-  cbor_serialize_int(stream, new_alarm_state);
 }
 
 
@@ -661,7 +671,7 @@ void test_payload_generator(void) {
   mock_event_code = 123;
   mock_event_type = EVENT_AND_ALARM_EVENT_TYPE_ALARM_CURRENT_STATE;
   mock_alarm_state = true;
-  event_and_alarm_base_payload_head(&mock_base);
+  event_and_alarm_base_payload_head(&mock_base, 0);
                                                                                 /* | timestamp | Sensor | alarm | */
   event_and_alarm_base_payload_alarm_current_state_generate(&mock_base,                3453,       463,     true); // Should be overwritten
   event_and_alarm_base_payload_alarm_current_state_generate(&mock_base,                6366,       234,     true); // Should be overwritten
@@ -672,7 +682,7 @@ void test_payload_generator(void) {
   test_utility_cbor_stream_print_hex(stream, 0, "curr state check");            // 9f 18 7b 19 02 9a 02 01 ff --> cbor.me --> [123, 666, 2, 1]
 
   { // Verification
-    uint8_t expected[] = {0x9f, 0x18, 0x7b, 0x01, 0x19, 0x02, 0x9a, 0x01, 0xff}; (void)(expected);
+    uint8_t expected[] = {0x84, 0x18, 0x7b, 0x01, 0x19, 0x02, 0x9a, 0x01}; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
 
@@ -681,7 +691,7 @@ void test_payload_generator(void) {
   mock_event_code = 123;
   mock_event_type = EVENT_AND_ALARM_EVENT_TYPE_ALARM_CURRENT_STATE;
   mock_alarm_state = true;
-  event_and_alarm_base_payload_head(&mock_base);
+  event_and_alarm_base_payload_head(&mock_base, 0);
                                                                                 /* | timestamp    | Sensor |  alarm | */
   event_and_alarm_base_payload_alarm_current_state_generate(&mock_base,                3453,          463,      true); // Should be overwritten
   event_and_alarm_base_payload_alarm_current_state_generate(&mock_base,                6366,          234,      true); // Should be overwritten
@@ -692,7 +702,7 @@ void test_payload_generator(void) {
   test_utility_cbor_stream_print_hex(stream, 0, "timestamp overflow check");
 
   { // Verification
-    char expected[] = {0x9f, 0x18, 0x7b, 0x01, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01, 0xff}; (void)(expected);
+    char expected[] = {0x84, 0x18, 0x7b, 0x01, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01}; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
 
@@ -701,7 +711,7 @@ void test_payload_generator(void) {
   mock_event_code = 123;
   mock_event_type = EVENT_AND_ALARM_EVENT_TYPE_ALARM_STATE_CHANGE_LOG;
   mock_alarm_state = true;
-  event_and_alarm_base_payload_head(&mock_base);
+  event_and_alarm_base_payload_head(&mock_base, 3);
                                                                                 /* | timestamp    | Sensor |  alarm | */
   event_and_alarm_base_payload_alarm_state_change_log_generate(&mock_base,             1488775951,    0,        true);
   event_and_alarm_base_payload_alarm_state_change_log_generate(&mock_base,             1488775952,    200,      true);
@@ -713,11 +723,10 @@ void test_payload_generator(void) {
 
   { // Verification
     char expected[] = {
-                        0x9f, 0x18, 0x7b, 0x02, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
-                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
-                        0xff
+                        0x83, 0x18, 0x7b, 0x02, 0x83, 0x82, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x0f, 0x00, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x10,
+                        0x18, 0xc8, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x19,
+                        0x01, 0x90
                       }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
@@ -729,7 +738,7 @@ void test_payload_generator(void) {
   mock_event_code = 123;
   mock_event_type = EVENT_AND_ALARM_EVENT_TYPE_EVENT_LOG;
   mock_alarm_state = true;
-  event_and_alarm_base_payload_head(&mock_base);
+  event_and_alarm_base_payload_head(&mock_base, 3);
                                                                                  /* | timestamp    | Sensor |  alarm | */
   event_and_alarm_base_payload_event_log_generate(&mock_base,                           1488775951,    0,        true);
   event_and_alarm_base_payload_event_log_generate(&mock_base,                           1488775952,    200,      true);
@@ -741,11 +750,10 @@ void test_payload_generator(void) {
 
   { // Verification
     char expected[] = {
-                        0x9f, 0x18, 0x7b, 0x03, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
-                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
-                        0xff
+                        0x83, 0x18, 0x7b, 0x03, 0x83, 0x82, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x0f, 0x00, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x10,
+                        0x18, 0xc8, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x19,
+                        0x01, 0x90
                       }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
@@ -786,7 +794,7 @@ void test_logger(void)
   test_utility_cbor_stream_print_hex(stream, 0, "timestamp overflow check");
 
   { // Verification
-    char expected[] = {0x9f, 0x18, 0x7b, 0x01, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01, 0xff}; (void)(expected);
+    char expected[] = {0x84, 0x18, 0x7b, 0x01, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x01}; (void)(expected);
 
 
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
@@ -811,11 +819,10 @@ void test_logger(void)
 
   { // Verification
     char expected[] = {
-                        0x9f, 0x18, 0x7b, 0x02, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
-                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
-                        0xff
+                        0x83, 0x18, 0x7b, 0x02, 0x83, 0x82, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x0f, 0x00, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x10,
+                        0x18, 0xc8, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x19,
+                        0x01, 0x90
                       }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
@@ -837,11 +844,10 @@ void test_logger(void)
 
   { // Verification
     char expected[] = {
-                        0x9f, 0x18, 0x7b, 0x03, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
-                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
-                        0xff
+                        0x83, 0x18, 0x7b, 0x03, 0x83, 0x82, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x0f, 0x00, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x10,
+                        0x18, 0xc8, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x19,
+                        0x01, 0x90
                       }; (void)(expected);
     TEST_ASSERT_EQUAL_INT8_ARRAY(expected, stream->data, sizeof(expected)/sizeof(expected[0]) );
   }
@@ -860,11 +866,10 @@ void test_logger(void)
   { // Verification (Note that first byte must be 0x02. It is the lwm2m type code for CBOR )
     char expected[] = {
                         0x02,
-                        0x9f, 0x18, 0x7b, 0x03, 0x9f, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x0f, 0x00, 0x01, 0xff, 0x9f, 0x1a, 0x58, 0xbc,
-                        0xeb, 0x10, 0x18, 0xc8, 0x01, 0xff, 0x9f, 0x1a, 0x58,
-                        0xbc, 0xeb, 0x11, 0x19, 0x01, 0x90, 0x01, 0xff, 0xff,
-                        0xff
+                        0x83, 0x18, 0x7b, 0x03, 0x83, 0x82, 0x1a, 0x58, 0xbc,
+                        0xeb, 0x0f, 0x00, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x10,
+                        0x18, 0xc8, 0x82, 0x1a, 0x58, 0xbc, 0xeb, 0x11, 0x19,
+                        0x01, 0x90
                       }; (void)(expected);
     uint8_t *val_ptr = 0;
     size_t length = 0;

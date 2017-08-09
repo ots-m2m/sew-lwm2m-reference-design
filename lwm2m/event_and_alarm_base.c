@@ -111,7 +111,7 @@ __static bool event_and_alarm_base_payload_event_type_check(event_and_alarm_base
   return true;  // Valid
 }
 
-__static bool event_and_alarm_base_payload_head(event_and_alarm_base_t *base_ptr)
+__static bool event_and_alarm_base_payload_head(event_and_alarm_base_t *base_ptr, const uint16_t logger_count)
 {
   assert(base_ptr);
   cbor_stream_t *stream = &(base_ptr->var.payload.stream);
@@ -126,33 +126,32 @@ __static bool event_and_alarm_base_payload_head(event_and_alarm_base_t *base_ptr
 
   base_ptr->var.payload.event_type = event_type;
 
-  // Start of CBOR array (Mandatory for all payload types)
-  cbor_serialize_array_indefinite(stream);
-
   switch (event_type)
   { // Setup the header
 
     case EVENT_AND_ALARM_EVENT_TYPE_ALARM_CURRENT_STATE:
     {
-      // Not Required
+      cbor_serialize_array(stream, 4);
     } break;
 
     case EVENT_AND_ALARM_EVENT_TYPE_ALARM_STATE_CHANGE_LOG:
     {
+      cbor_serialize_array(stream, 3);
       cbor_serialize_int(stream, event_code);
       cbor_serialize_int(stream, event_type);
 
-      // Opening Indefinite Array of State Change Logs
-      cbor_serialize_array_indefinite(stream);
+      // Opening Definite Array of State Change Logs
+      cbor_serialize_array(stream, logger_count);
     } break;
 
     case EVENT_AND_ALARM_EVENT_TYPE_EVENT_LOG:
     {
+      cbor_serialize_array(stream, 3);
       cbor_serialize_int(stream, event_code);
       cbor_serialize_int(stream, event_type);
 
-      // Opening Indefinite Array of Events
-      cbor_serialize_array_indefinite(stream);
+      // Opening Definite Array of Events
+      cbor_serialize_array(stream, logger_count);
     } break;
 
     // Unhandled
@@ -162,7 +161,6 @@ __static bool event_and_alarm_base_payload_head(event_and_alarm_base_t *base_ptr
 
   return true;
 }
-
 
 __static bool event_and_alarm_base_payload_alarm_current_state_generate(event_and_alarm_base_t *base_ptr, uint32_t timestamp, double new_sensor_value, bool new_alarm_state)
 {
@@ -176,7 +174,7 @@ __static bool event_and_alarm_base_payload_alarm_current_state_generate(event_an
   base_ptr->get_event_type(base_ptr->instance_id, &event_type);
 
   // Reset payload stream
-  event_and_alarm_base_payload_head(base_ptr);
+  event_and_alarm_base_payload_head(base_ptr, 0);
 
   // Generate payload again
   cbor_serialize_int(stream, event_code);
@@ -192,20 +190,18 @@ __static bool event_and_alarm_base_payload_alarm_state_change_log_generate(event
   assert(base_ptr);
   cbor_stream_t *stream = &(base_ptr->var.payload.stream);
 
-  // Opening Indefinite Array (To deliniate each event)
-  cbor_serialize_array_indefinite(stream);    // CBOR ARRAY [
-
-  // First element is always a timestamp
-  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
 
   // Append Values According To Event or Alarm Type
   if (base_ptr->payload_alarm_state_change_log_append)
   { // Append Function Handler Missing
-    base_ptr->payload_alarm_state_change_log_append(stream, new_sensor_value, new_alarm_state);
+    base_ptr->payload_alarm_state_change_log_append(stream, timestamp, new_sensor_value, new_alarm_state);
   }
-
-  // Closing Indefinite Array
-  cbor_write_break(stream);                   // CBOR BREAK ]
+  else
+  { /* Default Behaviour If No Append Function Defined */
+    cbor_serialize_array(stream, 2);
+    cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
+    cbor_serialize_int(stream, (uint16_t) new_sensor_value);
+  }
 
   return true;
 }
@@ -215,31 +211,28 @@ __static bool event_and_alarm_base_payload_event_log_generate(event_and_alarm_ba
   assert(base_ptr);
   cbor_stream_t *stream = &(base_ptr->var.payload.stream);
 
-  // Opening Indefinite Array (To deliniate each event)
-  cbor_serialize_array_indefinite(stream);    // CBOR ARRAY [
-
-  // First element is always a timestamp
-  cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
-
   // Append Values According To Event or Alarm Type
   if (base_ptr->payload_event_log_append)
   { // Handler Exist
-    base_ptr->payload_event_log_append(stream, new_sensor_value, new_alarm_state);
+    base_ptr->payload_event_log_append(stream, timestamp, new_sensor_value, new_alarm_state);
   }
-
-  // Closing Indefinite Array
-  cbor_write_break(stream);                   // CBOR BREAK ]
+  else
+  { /* Default Behaviour If No Append Function Defined */
+    cbor_serialize_array(stream, 2);
+    cbor_serialize_int64_t(stream, timestamp);  // Must ensure that we can handle timestamp without overflow
+    cbor_serialize_int(stream, (uint16_t) new_sensor_value);
+  }
 
   return true;
 }
 
 __static bool event_and_alarm_base_payload_footer(event_and_alarm_base_t *base_ptr)
 {
-  cbor_stream_t *stream = &(base_ptr->var.payload.stream);
   uint32_t event_type = 0;
 
   // Safer to stick to event that it was initialised during last reset
-  event_type = base_ptr->var.payload.event_type;  switch (event_type)
+  event_type = base_ptr->var.payload.event_type;
+  switch (event_type)
   { // Setup the header
     case EVENT_AND_ALARM_EVENT_TYPE_ALARM_CURRENT_STATE:
     {
@@ -247,22 +240,17 @@ __static bool event_and_alarm_base_payload_footer(event_and_alarm_base_t *base_p
     } break;
     case EVENT_AND_ALARM_EVENT_TYPE_ALARM_STATE_CHANGE_LOG:
     {
-      // Closing Indefinite Array of State Change Logs
-      cbor_write_break(stream);
+      // None required
     } break;
     case EVENT_AND_ALARM_EVENT_TYPE_EVENT_LOG:
     {
-      // Closing Indefinite Array of Events
-      cbor_write_break(stream);
+      // None required
     } break;
 
     // Unhandled
     default:
       break;
   };
-
-  // Closing Overall Indefinite Array
-  cbor_write_break(stream);
 
   return true;
 }
@@ -430,7 +418,7 @@ __static bool event_and_alarm_base_logger_generate_payload(event_and_alarm_base_
     {
       log_entry_ptr = &base_ptr->var.payload.logger_current_state;
       base_ptr->var.payload.latest_event_time = log_entry_ptr->timestamp;
-      event_and_alarm_base_payload_head(base_ptr);
+      event_and_alarm_base_payload_head(base_ptr, 0);
       event_and_alarm_base_payload_alarm_current_state_generate(
           base_ptr,
           log_entry_ptr->timestamp,
@@ -461,7 +449,7 @@ __static bool event_and_alarm_base_logger_generate_payload(event_and_alarm_base_
     }
 
     // Head
-    event_and_alarm_base_payload_head(base_ptr);
+    event_and_alarm_base_payload_head(base_ptr, logger_count);
 
     // Body
     for (uint16_t i=0 ; i < logger_count ; i++)
