@@ -18,6 +18,17 @@ lwm2m_object_declaration_t mock_object_declaration = {
 
 #define COAP_205_CONTENT                (uint8_t)0x45
 
+
+#ifdef  DISABLE_INTERVAL_DATA_BASE_TEST_ASSERTS
+#undef  TEST_ASSERT_TRUE
+#define TEST_ASSERT_TRUE(X) do {X;} while(0);
+#undef  TEST_ASSERT_FALSE
+#define TEST_ASSERT_FALSE(X) do {X;} while(0);
+#undef  TEST_ASSERT_EQUAL_INT8_ARRAY
+#define  TEST_ASSERT_EQUAL_INT8_ARRAY(...)
+#endif
+
+
 static double mock_value = 0.0;
 static double mock_get_value(uint16_t instance)
 {
@@ -290,7 +301,7 @@ static void test_interval_data_base_cbor_payload_basic(void)
                       0xff /* Blocks Container Closes*/
                       ,
                       0xff /* Payload Container Closes*/
-                    };
+                    }; (void)(expected);
   char expected_buffer[] = {
                       0x02 /* LWM2M Signature Value For CBOR Object */
                       ,
@@ -308,7 +319,7 @@ static void test_interval_data_base_cbor_payload_basic(void)
                       0xff /* Blocks Container Closes*/
                       ,
                       0xff /* Payload Container Closes*/
-                    };
+                    }; (void)(expected_buffer);
   mock_unix_time = 86400000; // 1000 days since unix epoch at midnight
   interval_period_s = 86400;
   interval_data_base_logger_clear(&mock_base);
@@ -360,7 +371,7 @@ static void test_interval_data_base_cbor_payload_missing_interval(void)
                       0xff /* Blocks Container Closes*/
                       ,
                       0xff /* Payload Container Closes*/
-                    };
+                    }; (void)(expected);
   mock_unix_time = 86400000; // 1000 days since unix epoch at midnight
   interval_period_s = 86400;  // 24hr
   interval_data_base_logger_clear(&mock_base);
