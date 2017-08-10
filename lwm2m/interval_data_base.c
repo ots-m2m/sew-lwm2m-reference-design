@@ -861,7 +861,6 @@ __static void interval_data_base_tick_instance(int32_t unix_epoch_time, interval
   uint16_t  instance = base_ptr->instance_id;
   uint32_t  local_time_s = 0;
 
-
   // Parameter Local Variable
   uint32_t interval_period        = 0; ///< Recording Intervals in Seconds
   uint32_t interval_start_offset  = 0; ///< number of seconds past midnight for
