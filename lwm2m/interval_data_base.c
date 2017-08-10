@@ -776,9 +776,10 @@ __static bool interval_data_base_logger_generate_payload_historical(
     log_debug("gen extra block %d (%u, %u)", block_index, log_entry_scan_index, entry_written_count);
   }
 
-  /** Payload Container Start
+  /** Payload Generation
   *******************************************/
-  cbor_result = cbor_serialize_array(stream, 2 + block_count );
+
+  cbor_result = cbor_serialize_array(stream, 3);
   if (!cbor_result)
   {
     log_err("Could not open payload container");
@@ -797,6 +798,19 @@ __static bool interval_data_base_logger_generate_payload_historical(
   {
     log_err("Could not write object id");
     return false;
+  }
+
+  if (block_count > 1)
+  { /* Only wrap block in array if more than one block. Else just save a byte */
+    // Design Note: This is so that the blocks are always in the same
+    //  relative position. This makes it easier to extend the payload field
+    //  without breaking changes.
+    cbor_result = cbor_serialize_array(stream, block_count);
+    if (!cbor_result)
+    {
+      log_err("Could not open payload container");
+      return false;
+    }
   }
 
   for (int block_index = 0 ; block_index < block_count ; block_index++)
