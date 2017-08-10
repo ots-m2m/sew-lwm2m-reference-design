@@ -18,6 +18,17 @@ lwm2m_object_declaration_t mock_object_declaration = {
 
 #define COAP_205_CONTENT                (uint8_t)0x45
 
+
+#ifdef  DISABLE_INTERVAL_DATA_BASE_TEST_ASSERTS
+#undef  TEST_ASSERT_TRUE
+#define TEST_ASSERT_TRUE(X) do {X;} while(0);
+#undef  TEST_ASSERT_FALSE
+#define TEST_ASSERT_FALSE(X) do {X;} while(0);
+#undef  TEST_ASSERT_EQUAL_INT8_ARRAY
+#define  TEST_ASSERT_EQUAL_INT8_ARRAY(...)
+#endif
+
+
 static double mock_value = 0.0;
 static double mock_get_value(uint16_t instance)
 {
@@ -276,39 +287,17 @@ static void test_interval_data_base_cbor_payload_basic(void)
   cbor_stream_t *stream = &(mock_base.var.payload.stream);
 
   char expected[] = {
-                      0x9f /* Payload Container Start*/
-                      ,
-                      0x19,0x1f,0x4a, // Object ID : 8010
-                      0x00,           // Instance  : 0
-                      0x9f /* Blocks Container Start*/
-                      ,
-                      /* Block 0*/
-                      0x9f, 0x1a, 0x05, 0x26, 0x5c, 0x00, 0x1a, 0x00, 0x01,
-                      0x51, 0x80, 0x9f, 0x9f, 0x01, 0xff, 0x9f, 0x02, 0xff,
-                      0x9f, 0x03, 0xff, 0x9f, 0x04, 0xff, 0xff, 0xff
-                      ,
-                      0xff /* Blocks Container Closes*/
-                      ,
-                      0xff /* Payload Container Closes*/
-                    };
+                      0x83, 0x19, 0x1f, 0x4a, 0x00, 0x83, 0x1a, 0x05, 0x26,
+                      0x5c, 0x00, 0x1a, 0x00, 0x01, 0x51, 0x80, 0x84, 0x01,
+                      0x02, 0x03, 0x04
+                    }; (void)(expected);
   char expected_buffer[] = {
                       0x02 /* LWM2M Signature Value For CBOR Object */
                       ,
-                      0x9f /* Payload Container Start*/
-                      ,
-                      0x19,0x1f,0x4a, // Object ID : 8010
-                      0x00,           // Instance  : 0
-                      0x9f /* Blocks Container Start*/
-                      ,
-                      /* Block 0*/
-                      0x9f, 0x1a, 0x05, 0x26, 0x5c, 0x00, 0x1a, 0x00, 0x01,
-                      0x51, 0x80, 0x9f, 0x9f, 0x01, 0xff, 0x9f, 0x02, 0xff,
-                      0x9f, 0x03, 0xff, 0x9f, 0x04, 0xff, 0xff, 0xff
-                      ,
-                      0xff /* Blocks Container Closes*/
-                      ,
-                      0xff /* Payload Container Closes*/
-                    };
+                      0x83, 0x19, 0x1f, 0x4a, 0x00, 0x83, 0x1a, 0x05, 0x26,
+                      0x5c, 0x00, 0x1a, 0x00, 0x01, 0x51, 0x80, 0x84, 0x01,
+                      0x02, 0x03, 0x04
+                    }; (void)(expected_buffer);
   mock_unix_time = 86400000; // 1000 days since unix epoch at midnight
   interval_period_s = 86400;
   interval_data_base_logger_clear(&mock_base);
@@ -341,26 +330,11 @@ static void test_interval_data_base_cbor_payload_missing_interval(void)
   cbor_stream_t *stream = &(mock_base.var.payload.stream);
 
   char expected[] = {
-                      0x9f /* Payload Container Start*/
-                      ,
-                      0x19,0x1f,0x4a, // Object ID : 8010
-                      0x00,           // Instance  : 0
-                      0x9f /* Blocks Container Start*/
-                      ,
-                      /* Block 0*/
-                      0x9f, 0x1a, 0x05, 0x26, 0x5c, 0x00, 0x1a, 0x00,
-                      0x01, 0x51, 0x80, 0x9f, 0x9f, 0x01, 0xff, 0x9f, 0x02,
-                      0xff, 0xff, 0xff
-                      ,
-                      /* Block 1*/
-                      0x9f, 0x1a, 0x05, 0x2a, 0x50, 0x80, 0x1a, 0x00,
-                      0x01, 0x51, 0x80, 0x9f, 0x9f, 0x03, 0xff, 0x9f, 0x04,
-                      0xff, 0xff, 0xff
-                      ,
-                      0xff /* Blocks Container Closes*/
-                      ,
-                      0xff /* Payload Container Closes*/
-                    };
+                      0x83, 0x19, 0x1f, 0x4a, 0x00, 0x82, 0x83, 0x1a, 0x05,
+                      0x26, 0x5c, 0x00, 0x1a, 0x00, 0x01, 0x51, 0x80, 0x82,
+                      0x01, 0x02, 0x83, 0x1a, 0x05, 0x2a, 0x50, 0x80, 0x1a,
+                      0x00, 0x01, 0x51, 0x80, 0x82, 0x03, 0x04
+                    }; (void)(expected);
   mock_unix_time = 86400000; // 1000 days since unix epoch at midnight
   interval_period_s = 86400;  // 24hr
   interval_data_base_logger_clear(&mock_base);
