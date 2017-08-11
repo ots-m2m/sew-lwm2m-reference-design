@@ -233,7 +233,7 @@ __static bool interval_data_base_payload_head(interval_data_base_t *base_ptr, co
   return result;  // False if failed (e.g. no buffer space)
 }
 
-__static bool interval_data_base_payload_add_interval(interval_data_base_t *base_ptr, const uint32_t input_interval_value)
+__static bool interval_data_base_payload_add_interval(interval_data_base_t *base_ptr, const uint32_t input_interval_value, const void *sensor_ext_ptr)
 {
   assert(base_ptr);
   cbor_stream_t *stream = &(base_ptr->var.payload.stream);
@@ -247,6 +247,26 @@ __static bool interval_data_base_payload_add_interval(interval_data_base_t *base
 #if INTERVAL_DATA_BASE_VERBOSE_DEBUG
   log_debug("adding interval to payload: value:%lu stream(pos:%lu, size:%lu)", (long unsigned) input_interval_value, (long unsigned) stream->pos, (long unsigned) stream->size);
 #endif
+
+  /*
+    Design Note: Multivalue Interval Payload Suggestion
+      If you are trying to have multiple values in payload add interval,
+      sensor_ext_ptr is passed here so you can extract extra values.
+      You would not do it in this base file however. Instead you would be doing
+      it in children objects. E.g.
+
+      ```
+      Water_Flow_Readings_Payload_Interval_Values_append(cbor_stream_t *stream, const uint32_t input_interval_value, const void *sensor_ext_ptr);
+      ```
+
+      interval_data_base_payload_add_interval() would just call the above
+      function. The above function would have similar logic to below, but
+      append multiple values based on sensor_ext_ptr content that it had
+      recorded on the last. Do note that you should wrap the multi value
+      interval with cbor_serialize_array() so that each interval can be
+      distinguished.
+
+  */
 
   /** Interval Open
   ******************/
@@ -276,7 +296,6 @@ __static bool interval_data_base_payload_add_interval(interval_data_base_t *base
   }
 
   result = cbor_serialize_int(stream, interval_value) ? result : false;
-
 
   return result;  // False if failed (e.g. no space left)
 }
@@ -391,7 +410,7 @@ __static bool interval_data_base_logger_stats(
   Logger Record
 
 ------------------------------------------------------------------------------*/
-__static bool interval_data_base_logger_record(interval_data_base_t *base_ptr, uint32_t unix_epoch_timestamp, uint32_t interval_period, double new_sensor_value)
+__static bool interval_data_base_logger_record(interval_data_base_t *base_ptr, uint32_t unix_epoch_timestamp, uint32_t interval_period, double new_sensor_value, void *sensor_ext_ptr)
 {
   assert(base_ptr);
 
@@ -404,9 +423,10 @@ __static bool interval_data_base_logger_record(interval_data_base_t *base_ptr, u
 
   /** Record (overwrite old records if full)
   *******************************************/
-  base_ptr->var.logger.entries[logger_write_pos].timestamp     = unix_epoch_timestamp;
-  base_ptr->var.logger.entries[logger_write_pos].sensor_value  = new_sensor_value;
-  base_ptr->var.logger.entries[logger_write_pos].interval_period = interval_period;
+  base_ptr->var.logger.entries[logger_write_pos].timestamp        = unix_epoch_timestamp;
+  base_ptr->var.logger.entries[logger_write_pos].interval_period  = interval_period;
+  base_ptr->var.logger.entries[logger_write_pos].sensor_ext       = sensor_ext_ptr;
+  base_ptr->var.logger.entries[logger_write_pos].sensor_value     = new_sensor_value;
 
   /** Update Position Reference
   *******************************************/
@@ -649,9 +669,10 @@ __static bool interval_data_base_logger_generate_payload_historical_append_block
 
     // Get Entry Values
     uint32_t entry_sensor_value = (uint32_t) log_entry_ptr->sensor_value;
+    void *   sensor_ext = log_entry_ptr->sensor_ext;     // This points to a custom extra entry
 
     // Add Entry To Payload
-    error = interval_data_base_payload_add_interval(base_ptr, entry_sensor_value) ? error : true;
+    error = interval_data_base_payload_add_interval(base_ptr, entry_sensor_value, sensor_ext) ? error : true;
   }
 
   error = interval_data_base_payload_footer(base_ptr) ? error : true;
@@ -915,9 +936,10 @@ __static void interval_data_base_tick_instance(int32_t unix_epoch_time, interval
   {
     log_debug("instance: %d, local_time_s: %ld interval time: %ld", base_ptr->instance_id, local_time_s, var_ptr->next_interval_record_time_s);
 
-    double sensor_value = base_ptr->get_value(instance);
-    uint32_t latest_recorded_timestamp = 0;
-    uint32_t oldest_recorded_timestamp = 0;
+    void *    sensor_ext_ptr = NULL;
+    double    sensor_value = base_ptr->get_value(instance, &sensor_ext_ptr);
+    uint32_t  latest_recorded_timestamp = 0;
+    uint32_t  oldest_recorded_timestamp = 0;
 
 #ifdef INTERVAL_DATA_BASE_LED_VISUAL_INDICATOR
   led_set(0, true);
@@ -935,7 +957,7 @@ __static void interval_data_base_tick_instance(int32_t unix_epoch_time, interval
     }
 
     // Record Current Time and update statistics
-    interval_data_base_logger_record(base_ptr, GET_INTERVAL_TIME(unix_epoch_time, interval_start_offset, interval_period, 0), interval_period, sensor_value);
+    interval_data_base_logger_record(base_ptr, GET_INTERVAL_TIME(unix_epoch_time, interval_start_offset, interval_period, 0), interval_period, sensor_value, sensor_ext_ptr);
     interval_data_base_logger_stats(base_ptr, &latest_recorded_timestamp, &oldest_recorded_timestamp);
 
     // Set base parameter to report oldest and latest interval

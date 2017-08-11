@@ -30,8 +30,10 @@ lwm2m_object_declaration_t mock_object_declaration = {
 
 
 static double mock_value = 0.0;
-static double mock_get_value(uint16_t instance)
+static double mock_get_value(uint16_t instance, void **sensor_ext_ptr)
 {
+  if (sensor_ext_ptr) *sensor_ext_ptr = "extended payload";
+
   return mock_value;
 }
 
@@ -209,7 +211,6 @@ void test_interval_data_visual(void)
   }
 
   // Checkout what the payload looks like
-  cbor_stream_t *stream = &(mock_base.var.payload.stream);
   interval_data_base_logger_generate_payload_historical(&mock_base, 0, 0, NULL, NULL);
   test_utility_cbor_stream_print_hex(stream, 0, "test interval latest payload");
 
@@ -302,10 +303,10 @@ static void test_interval_data_base_cbor_payload_basic(void)
   interval_period_s = 86400;
   interval_data_base_logger_clear(&mock_base);
                                 /* base_ptr, unix_epoch_timestamp, interval_period, new_sensor_value */
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 1 ); mock_unix_time += interval_period_s;
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 2 ); mock_unix_time += interval_period_s;
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 3 ); mock_unix_time += interval_period_s;
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 4 ); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 1, NULL); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 2, NULL); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 3, NULL); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 4, NULL); mock_unix_time += interval_period_s;
 
   /* Generate and test */
   TEST_ASSERT_TRUE(interval_data_base_logger_generate_payload_historical(&mock_base, 0, 0, NULL, NULL));
@@ -339,11 +340,11 @@ static void test_interval_data_base_cbor_payload_missing_interval(void)
   interval_period_s = 86400;  // 24hr
   interval_data_base_logger_clear(&mock_base);
                                   /* base_ptr, unix_epoch_timestamp, new_sensor_value */
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 1 ); mock_unix_time += interval_period_s;
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 2 ); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 1, NULL); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 2, NULL); mock_unix_time += interval_period_s;
   mock_unix_time += interval_period_s; /* Skipped Period */
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 3 ); mock_unix_time += interval_period_s;
-  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 4 ); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 3, NULL); mock_unix_time += interval_period_s;
+  interval_data_base_logger_record(&mock_base, mock_unix_time, interval_period_s, 4, NULL); mock_unix_time += interval_period_s;
 
   /* Generate and test */ // TODO: Must throw some error or partial payload
   TEST_ASSERT_TRUE(interval_data_base_logger_generate_payload_historical(&mock_base, 0, 0, NULL, NULL));

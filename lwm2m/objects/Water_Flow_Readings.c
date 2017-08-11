@@ -41,7 +41,7 @@ extern lwm2m_object_declaration_t Water_Flow_Readings_object_declaration;
 #define DEFAULT_INSTANCE_1_VALUE_INTERVAL_UTC_OFFSET                CONFIG_Water_Flow_Readings_DEFAULT_INSTANCE_1_VALUE_INTERVAL_UTC_OFFSET
 #define DEFAULT_INSTANCE_1_VALUE_INTERVAL_DELIVERY_MIDNIGHT_ALIGNED CONFIG_Water_Flow_Readings_DEFAULT_INSTANCE_1_VALUE_INTERVAL_DELIVERY_MIDNIGHT_ALIGNED
 
-double Water_Flow_Readings_get_value(uint16_t instance_id);  // Required by interval base declaration
+double Water_Flow_Readings_get_value(uint16_t instance_id, void **sensor_ext_ptr);  // Required by interval base declaration
 
 // The DECLARE_EVENT_AND_ALARM_INSTANCE macro requires a function <name>_get_value to be
 // declared which is used to read the actual alarm value from the sensor.
@@ -119,7 +119,7 @@ __static void Water_Flow_Readings_object_initialise_instance(
 // This function must read the sensor value to return the current value of the sensor.
 // e.g. read the ADC for its current value and convert to the units that are aligned
 // with the units in the threshold operators.
-double Water_Flow_Readings_get_value(uint16_t instance_id)
+double Water_Flow_Readings_get_value(uint16_t instance_id, void **sensor_ext_ptr)
 {
   static double prev_value_array[MAX_Water_Flow_Readings_INSTANCES] = {0};
   double return_value = prev_value_array[instance_id];  // get

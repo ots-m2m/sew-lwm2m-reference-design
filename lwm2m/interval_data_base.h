@@ -25,8 +25,8 @@
 
 #define INTERVAL_DATA_BASE_VERBOSE_DEBUG 0 // Verbose mode for debug messages
 
-// Sensor Getter
-typedef double  (*get_value_func_t)(uint16_t instance_id);
+// Sensor Getter // Note: If sensor_ext_ptr is passed to this sensor getter then internally it would capture the value and return a pointer to the extended value structure. This is not used by this base. Instead its used by the child object to construct extended values in the payload.
+typedef double  (*interval_data_base_get_value_func_t)(uint16_t instance_id, void **sensor_ext_ptr);
 
 // Alarm Getter Function Types
 typedef uint8_t (*bool_get_func_t          )(uint16_t instance, bool *val);
@@ -70,7 +70,8 @@ typedef struct interval_data_base_log_entries_t
 { // Entries
   uint32_t timestamp; // UNIX EPOCH (Convert as needed to local time)
   uint32_t interval_period;
-  double sensor_value;
+  double   sensor_value;
+  void *   sensor_ext;     // This points to a custom extra entry
 } interval_data_base_log_entries_t;
 
 typedef struct interval_data_base_logger_t
@@ -125,7 +126,7 @@ typedef struct interval_data_base_t
   *************/
 
   // Sensor Application Function Call
-  get_value_func_t       get_value;            //  sensor value
+  interval_data_base_get_value_func_t get_value;            //  sensor value
 
   /* Base Object Interface
   *************************/
@@ -232,7 +233,7 @@ bool interval_data_base_logger_stats(
                 uint32_t *latest_recorded_timestamp,
                 uint32_t *oldest_recorded_timestamp
               );
-bool interval_data_base_logger_record(interval_data_base_t *base_ptr, uint32_t unix_epoch_timestamp, uint32_t interval_period, double new_sensor_value);
+bool interval_data_base_logger_record(interval_data_base_t *base_ptr, uint32_t unix_epoch_timestamp, uint32_t interval_period, double new_sensor_value, void *sensor_ext_ptr);
 bool interval_data_base_logger_generate_payload_historical(
          interval_data_base_t *base_ptr,
          const uint32_t first_interval_timestamp_s,  ///< number of seconds since Jan 1st, 1970 in the UTC time zone
