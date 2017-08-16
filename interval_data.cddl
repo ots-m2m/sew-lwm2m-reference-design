@@ -1,0 +1,47 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Event and Alarm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+interval_data_payload = [
+  object_id:       uint,
+  instance_id:     uint,
+  interval_data_collection
+]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Interval Block
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+interval_data_collection = (
+  interval_data_block //
+  interval_data_multi_block
+)
+
+interval_data_multi_block = [
+  2* interval_data_block
+]
+
+interval_data_block = [
+  interval_timestamp:   uint,
+  interval_period:      uint
+  interval_data_entries_collection
+]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Interval Entries
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+interval_data_entries_collection = [
+  +interval_data_single_value_entry //
+  2* interval_data_multi_value_entry
+]
+
+interval_data_single_value_entry = (
+  value: uint
+)
+
+interval_data_multi_value_entry = [
+  +value: uint
+]
