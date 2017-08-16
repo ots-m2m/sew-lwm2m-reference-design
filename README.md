@@ -133,16 +133,23 @@ The required steps are:
 
 1. Setup SLIP on Pi board, enable packet and port forwarding
 
+        # Attach SLIP to UART
         sudo slattach -v -p slip -s 115200 /dev/ttyAMA0 &
         sudo ifconfig sl0 192.168.5.1 pointopoint 192.168.5.2 mtu 1500 netmask 255.255.255.0
         sudo sysctl net.ipv4.ip_forward=1
 
+        # Check Ping to device
         ping -c 2 -W 1 192.168.5.2
 
+        # Ip Table Config
         sudo iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
         sudo iptables -A FORWARD -i sl0 -o eth0 -j ACCEPT
         sudo iptables -t nat -A POSTROUTING -p udp -o eth0 -j SNAT --to-source `ifconfig eth0 | grep "inet addr" | cut -d: -f2 | cut -d' ' -f1`
         sudo iptables -t nat -A PREROUTING -p udp -i eth0 --dport 5683 -j DNAT --to-destination 192.168.5.2:5683
+
+        # Set NAT Timeout
+        sudo sysctl net.netfilter.nf_conntrack_udp_timeout=3600
+        sudo sysctl net.netfilter.nf_conntrack_udp_timeout_stream=3600
 
 1. Sometimes the route to use wlan0 may stop slip modem from working properly. Disable it.
 
@@ -150,6 +157,9 @@ The required steps are:
 
 Once configured the example board is reached on `192.168.5.2`.
 
+## Nat Timeout Config Check
+
+To check current NAT configurations type `sudo sysctl -a | grep conntrack`
 
 # Doxygen Callgraphs
 
